@@ -1,0 +1,91 @@
+# Reasons Behind `productive-k3s-profiles`
+
+`productive-k3s-profiles` exists because profile/scenario source content and runtime execution solve different problems.
+
+## Why not stop at `productive-k3s-core`
+
+`productive-k3s-core` is the bootstrap contract for installing and validating a K3S-based stack.
+
+That is enough when:
+
+- one host already exists
+- the operator can work directly on that machine
+- the cluster topology is simple enough to assemble by hand
+
+It is not enough when you also need to standardize:
+
+- how machines are provisioned
+- how node roles are declared
+- how inventories and hostnames are rendered
+- how multi-node bootstrap steps are sequenced
+- how infrastructure-specific validation should run
+
+## Why split profiles from the Infra engine
+
+This repository is intentionally centered on public source content instead of the runtime engine.
+
+The split exists so that:
+
+- changing a public scenario does not force a new `productive-k3s-infra` bundle
+- `productive-k3s-infra` can validate compatibility against this repo without owning its contents
+- `productive-k3s-ops` can package `profile.tgz` artifacts from a clean source-of-truth repo
+
+## Why scenarios are still the practical authoring unit
+
+Even though published artifacts are profile-oriented, the implementation is still scenario driven.
+
+The design goal is to provide deployment paths that are:
+
+- reusable
+- evaluable
+- explicit
+- close to what a team would actually run
+
+That is why the public entry points are things like:
+
+- local Multipass clusters
+- on-premises SSH bootstrap
+- a basic AWS single-node path
+
+instead of a collection of disconnected helper fragments.
+
+## Why keep shared layers underneath
+
+Even though the public interface is scenario driven, the implementation still needs reuse boundaries.
+
+The repository therefore keeps shared source logic in layers such as:
+
+- `ansible/roles/remote_cluster` for SSH-side bootstrap and validation
+- `opentofu/` for infrastructure provisioning concerns
+- scenario-local testing and validation conventions exercised through CI
+
+That split makes it easier to evolve one public path without copy-pasting everything into every other path.
+
+## Why the explicit mode split matters
+
+The `server`, `agent`, `stack`, and `single-node` modes exposed by `productive-k3s-core` are what make infrastructure orchestration realistic.
+
+They let this repository:
+
+1. create or target machines first
+2. assemble the cluster second
+3. install the shared stack last
+
+Without that split, public scenario authoring would have to fight a more monolithic bootstrap flow.
+
+## Overall rationale
+
+Taken together, the repository is meant to sit between raw infrastructure scripting and a fully productized private platform.
+
+It aims to provide:
+
+- infrastructure flows that are still public and understandable
+- scenarios that are more realistic than toy examples
+- a stable bridge into real multi-node or remote K3S environments
+- a clean content boundary between OSS and Pro profile repositories
+
+## See also
+
+- [Product overview](index.md)
+- [How to use Productive K3S Profiles](how-to-use.md)
+- [Relationship with Productive K3S Core](productive-k3s-relationship.md)

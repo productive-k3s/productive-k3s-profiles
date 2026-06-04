@@ -1,5 +1,9 @@
 runs/
 __pycache__/
+docs/.venv/
+docs/site/
+docs/.mkdocs.pid
+docs/.mkdocs.log
 .terraform/
 *.tfstate
 *.tfstate.*

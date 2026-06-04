@@ -11,6 +11,19 @@ This repository contains the authoring surface for:
 
 It is the source-of-truth content repository used by `productive-k3s-ops` to generate published `profile.tgz` artifacts.
 
+## Documentation
+
+The published documentation site for this repository is:
+
+- [profiles.productive-k3s.io](https://profiles.productive-k3s.io/)
+
+Local docs workflow:
+
+```bash
+make docs-build
+make docs-serve
+```
+
 ## Relationship with the Infra engine
 
 - `productive-k3s-infra` is the Infra engine/runtime.
@@ -26,6 +39,7 @@ The goal of this split is to avoid coupling every profile/scenario change to a n
 productive-k3s-profiles/
   profiles/
   scenarios/
+  docs/
 ```
 
 ## Notes
