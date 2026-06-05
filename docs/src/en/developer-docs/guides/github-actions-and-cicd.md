@@ -1,91 +1,72 @@
 # CI/CD Flow
 
-This repository has a CI-friendly validation model and now includes a post-merge GitHub Actions workflow for the public `onprem-basic` path on a GitHub-hosted Ubuntu `24.04` runner.
+`productive-k3s-profiles` uses a lightweight CI model by default.
+
+The goal is to validate public content structure and engine compatibility contracts on every change, without forcing live runtime validation in every pull request.
 
 ## What exists today
 
-- deterministic root `make` targets for docs and matrix validation
-- structured `static`, `contract`, and `live` levels
-- anonymous JSON artifacts under `test-artifacts/` for run evidence, including per-scenario manifests and matrix summaries
-- a clear split between operator entry points and implementation scripts
-- a dedicated `test-live-gha-onprem` target that treats the GitHub runner as the remote `onprem-basic` host
-- a tag-driven release workflow for `productive-k3s-profiles-cli.sh`
+- deterministic root `make` targets for docs and content validation
+- root-level `static`, `contract`, and `live` suites
+- a repository-local test runner that delegates execution to a selected version of `productive-k3s-infra`
+- a default CI workflow that runs `make test-matrix`
+- a separate docs workflow for the published site
 
-## Release tags
+## Default CI contract
 
-Published releases must use composite tags:
+The default CI path for this repository is:
 
-- `X.Y.Z-A.B.C`
-- `X.Y.Z`: version of `productive-k3s-profiles`
-- `A.B.C`: bound release of `productive-k3s-core`
+1. run `make test-matrix`
+2. keep `live` validation manual unless a maintainer explicitly decides to run it
 
-The release workflow validates that format and publishes an infra bundle whose public CLI is already tied to that `productive-k3s-core` version.
+In practice that means:
 
-The repo-level default for official release-oriented flows now lives in `scripts/release-config.sh`:
+- `static` runs in CI
+- `contract` runs in CI
+- `live` is manual pre-push or pre-release validation
 
-- `PRODUCTIVE_K3S_SOURCE_DEFAULT=remote`
-- `PRODUCTIVE_K3S_CORE_VERSION_DEFAULT=<current bundled core version>`
-- `PRODUCTIVE_K3S_RELEASE_REPO_DEFAULT=<core release repo>`
+This keeps CI fast and reproducible while still allowing maintainers to exercise the full runtime path when needed.
 
-That config is the single source of truth for the default remote `productive-k3s-core` version used when composing official infra release tags.
+## Current test workflow
 
-For developer maintenance, this repo also ships a private helper that rewrites the versioned examples and test expectations in one pass:
+The repository includes `.github/workflows/tests.yml`.
 
-- `make set-core-version CORE_VERSION=A.B.C`
-- `./scripts/set-core-version.sh A.B.C`
+That workflow currently:
 
-## Creating a release tag
+1. checks out the repository
+2. installs OpenTofu
+3. runs `make test-matrix INFRA_VERSION=development`
 
-The supported release tagging flow is:
+The matrix here is intentionally content-focused:
 
-1. run `make set-core-version CORE_VERSION=A.B.C` when the bundled core version changes
-2. run `make tag-release VERSION=X.Y.Z`
-3. push the resulting composite tag with `git push origin X.Y.Z-A.B.C`
+- it validates all public scenarios
+- it uses the selected Infra engine version as the contract owner
+- it does not run the full live runtime suite by default
 
-The helper validates all of the following before creating the local tag:
+## Manual live validation
 
-- the infra version input matches `X.Y.Z`
-- the repo default source is `remote`
-- the default bundled core version is valid
-- the default bundled core tag exists in the configured upstream `productive-k3s-core` remote
-- the resulting composite infra tag does not already exist locally
+Maintainers can run live validation locally before pushing sensitive scenario changes, for example:
 
-Local development can still override `PRODUCTIVE_K3S_SOURCE`, `PRODUCTIVE_K3S_VERSION`, and `PRODUCTIVE_K3S_RELEASE_REPO` manually. The repo defaults only define the official release-oriented path.
+```bash
+make test-live PROFILE=multipass-1-server-2-agents INFRA_VERSION=0.9.62-0.9.4
+make test-live PROFILE=on-prem-basic INFRA_VERSION=0.9.62-0.9.4
+make test-live-matrix INFRA_VERSION=0.9.62-0.9.4
+```
 
-## Practical CI/CD model
+Because these flows may require Multipass, SSH reachability, or cloud credentials, they are intentionally not required on every CI run.
 
-In CI, the intended flow is:
+## Relationship with Infra CI
 
-1. run `make test-static`
-2. run `make test-contract`
-3. run `make test-live-gha-onprem` after merges to `main`
-4. run the broader live layer only where the environment supports it
-5. keep the resulting artifacts as evidence
+This repository validates public content from the content side.
 
-## Why document it now
+`productive-k3s-infra` still needs its own compatibility lane that clones this repository and proves engine-side changes do not break public profiles.
 
-The checked-in workflow still benefits from documenting the CI/CD contract because:
+That gives two complementary directions:
 
-- it stabilizes the repository interface
-- it defines what future automation should call
-- it keeps local and CI execution aligned
-
-## Current public workflow
-
-The repository includes `.github/workflows/post-merge-onprem-github-host.yml`.
-
-That workflow runs when a pull request targeting `main` is closed in the merged state. It:
-
-1. runs `make test-static`
-2. runs `make test-contract`
-3. checks out sibling `productive-k3s-core`
-4. runs `make test-live-gha-onprem`
-
-The live job prepares `openssh-server` on the GitHub-hosted runner and then exercises `scenarios/edge/onprem-basic` against `127.0.0.1` as a single-node remote host.
-
-When the checked out sibling `productive-k3s-core` revision already includes `scripts/preflight-host.sh`, that same hosted path also exercises the remote Productive K3S Core host preflight before bootstrap starts.
+- `profiles -> infra`: does this content satisfy the expected engine contract?
+- `infra -> profiles`: did an engine change break existing public content?
 
 ## Notes
 
 !!! note
-    The public workflow intentionally validates the `onprem-basic` single-host path only. It does not replace the broader local `live` matrix that still depends on environments such as Multipass or external cloud credentials.
+    Packaging and publication checks still belong in `productive-k3s-ops`, not in this repository.

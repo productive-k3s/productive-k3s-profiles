@@ -24,6 +24,25 @@ make docs-build
 make docs-serve
 ```
 
+## Content validation
+
+This repository can validate its own public content against a selected version of the `productive-k3s-infra` engine.
+
+Examples:
+
+```bash
+make test-static PROFILE=multipass-1-server-2-agents
+make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
+make test-live PROFILE=on-prem-basic INFRA_VERSION=0.9.62-0.9.4
+make test-matrix
+```
+
+Behavior:
+
+- `test-matrix` runs `static + contract`
+- `test-live` is intended for manual pre-push validation
+- if `INFRA_VERSION` is omitted, the runner resolves the latest released `productive-k3s-infra`
+
 ## Relationship with the Infra engine
 
 - `productive-k3s-infra` is the Infra engine/runtime.

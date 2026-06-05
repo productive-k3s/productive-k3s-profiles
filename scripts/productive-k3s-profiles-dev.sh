@@ -15,6 +15,11 @@ Development commands:
   docs-up
   docs-down
   docs-clean
+  test-static
+  test-contract
+  test-live
+  test-matrix
+  test-live-matrix
 EOF
 }
 
@@ -38,6 +43,21 @@ case "${COMMAND}" in
     ;;
   docs-down|docs-clean)
     exec "${REPO_DIR}/docs/clean.sh" "$@"
+    ;;
+  test-static)
+    exec "${REPO_DIR}/tests/common.sh" test-static "$@"
+    ;;
+  test-contract)
+    exec "${REPO_DIR}/tests/common.sh" test-contract "$@"
+    ;;
+  test-live)
+    exec "${REPO_DIR}/tests/common.sh" test-live "$@"
+    ;;
+  test-matrix)
+    exec "${REPO_DIR}/tests/common.sh" test-matrix "$@"
+    ;;
+  test-live-matrix)
+    exec "${REPO_DIR}/tests/common.sh" test-live-matrix "$@"
     ;;
   -h|--help|help)
     usage

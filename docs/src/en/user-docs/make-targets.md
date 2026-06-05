@@ -1,6 +1,6 @@
 # Make Targets
 
-`make` is the main development and source-based authoring interface of this repository.
+`make` is the main development and content-validation interface of this repository.
 
 Published profiles are consumed through `pk3s` or `productive-k3s-infra`, not through a dedicated runtime CLI in this repo:
 
@@ -9,7 +9,7 @@ pk3s infra install multipass-1-server-2-agents
 ./productive-k3s-infra.sh profile install --tgz ./multipass-1-server-2-agents.tgz
 ```
 
-The targets below remain intentionally source-based and are aimed at repository development, CI, and scenario authoring.
+The root targets below are intentionally source-oriented and are aimed at repository development, CI, and scenario authoring.
 
 ## Root-level targets
 
@@ -19,111 +19,66 @@ The targets below remain intentionally source-based and are aimed at repository 
 | `make docs-serve` | Serve the docs locally |
 | `make docs-up` | Run the docs server in the background |
 | `make docs-down` | Stop the docs server and clean docs artifacts |
-| `make test-clean` | Remove local matrix test result artifacts before a new validation cycle |
-| `make test-checkstatus` | Summarize the currently recorded matrix test outcomes from local artifacts |
-| `make test-static` | Run static checks across all public scenarios |
-| `make test-contract` | Run contract checks across all public scenarios |
-| `make test-live` | Run live validations across all public scenarios |
-| `make test-live-onprem-arm` | Run only the public ARM live validation through `scenarios/edge/onprem-basic-arm` |
-| `make test-live-gha-onprem` | Run the GitHub-hosted single-node `onprem-basic` live validation |
-| `make test-aws-localstack-contract` | Run the AWS single-node infrastructure contract validation against LocalStack |
-| `make test-matrix` | Run `static`, `contract`, and `live` in sequence |
-| `make scenario-up SCENARIO=...` | Run `up` on the selected scenario through one generic entrypoint |
-| `make scenario-down SCENARIO=...` | Run `down` on the selected scenario when that scenario supports it |
-| `make scenario-status SCENARIO=...` | Run `status` on the selected scenario |
-| `make scenario-infra-up SCENARIO=...` | Run `infra-up` on the selected scenario when that scenario supports it |
-| `make scenario-infra-down SCENARIO=...` | Run `infra-down` on the selected scenario when that scenario supports it |
-| `make multipass` | Run the default public `multipass` flow (`up`) |
-| `make onprem` | Run the default public `onprem-basic` flow (`up`) |
-| `make onprem-arm` | Run the default public `onprem-basic-arm` flow (`up`) |
-| `make aws-single-node` | Run the default public AWS single-node flow (`up`) |
+| `make test-static PROFILE=...` | Run only the `static` suite for the selected public profile or scenario |
+| `make test-contract PROFILE=...` | Run only the `contract` suite for the selected public profile or scenario |
+| `make test-live PROFILE=...` | Run only the `live` suite for the selected public profile or scenario |
+| `make test-matrix` | Run `static + contract` across all public scenarios |
+| `make test-live-matrix` | Run `live` across all public scenarios |
 
-Accepted `SCENARIO` values:
+Supported selector inputs:
 
-- `multipass`
-- `onprem`
-- `onprem-arm`
-- `aws-single-node`
+- `PROFILE=<published-profile-name>`
+- `SCENARIO=<source-scenario-name>`
 
-The short aliases above are only convenience wrappers for `up`. The `scenario-...` targets are the recommended generic interface.
+Examples:
 
-## Multipass targets
+```bash
+make test-static PROFILE=multipass-1-server-2-agents
+make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
+make test-live PROFILE=on-prem-basic INFRA_VERSION=0.9.62-0.9.4
+make test-static SCENARIO=onprem-basic
+make test-matrix
+```
 
-| Target | Purpose |
+## Infra engine selection
+
+The root test runner validates source content against a selected version of `productive-k3s-infra`.
+
+Available inputs:
+
+| Variable | Purpose |
 | --- | --- |
-| `infra-init` | Initialize the `OpenTofu` working directory |
-| `infra-up` | Create the VMs and refresh generated metadata |
-| `cluster-up` | Run the multi-node bootstrap flow |
-| `stack-up` | Re-run the shared stack installation on the server |
-| `validate` | Run scenario validation |
-| `up` | `infra-up + cluster-up + validate` |
-| `down` | Destroy the VMs |
-| `clean` | Remove generated artifacts and local `OpenTofu` state |
-| `status` | Re-render and print `generated/cluster.json` |
-| `test-static` | Run only the `multipass` static validation path and record a local test manifest |
-| `test-contract` | Run only the `multipass` contract validation path and record a local test manifest |
-| `test-live` | Run only the `multipass` live validation path and record a local test manifest |
-| `test-clean` | Remove only the recorded matrix test artifacts for `multipass` |
-| `test-checkstatus` | Summarize only the recorded matrix test outcomes for `multipass` |
+| `INFRA_VERSION` | Clone and use a specific released branch or tag of `productive-k3s-infra` |
+| `PRODUCTIVE_K3S_INFRA_REPO_DIR` | Use a local Infra checkout instead of cloning a release |
 
-## On-prem basic targets
+Behavior:
 
-| Target | Purpose |
-| --- | --- |
-| `preflight` | Validate remote reachability and runtime support, copy the bundle, and run the remote Productive K3S Core host preflight when available |
-| `cluster-up` | Run remote bootstrap across the declared nodes |
-| `stack-up` | Re-run the shared stack installation |
-| `validate` | Run remote validation |
-| `up` | `cluster-up + validate` |
-| `status` | Re-render and print `generated/cluster.json` |
-| `clean` | Remove local generated metadata |
-| `test-static` | Run only the `onprem-basic` static validation path and record a local test manifest |
-| `test-contract` | Run only the `onprem-basic` contract validation path and record a local test manifest |
-| `test-live` | Run only the `onprem-basic` live validation path and record a local test manifest |
-| `test-clean` | Remove only the recorded matrix test artifacts for `onprem-basic` |
-| `test-checkstatus` | Summarize only the recorded matrix test outcomes for `onprem-basic` |
+- if `PRODUCTIVE_K3S_INFRA_REPO_DIR` is set, the local checkout wins
+- if `INFRA_VERSION` is omitted, the runner resolves the latest released `productive-k3s-infra`
 
-## On-prem basic ARM targets
+Examples:
 
-| Target | Purpose |
-| --- | --- |
-| `preflight` | Validate remote reachability and runtime support, copy the bundle, and run the remote Productive K3S Core host preflight when available |
-| `cluster-up` | Run remote bootstrap across the declared ARM nodes |
-| `stack-up` | Re-run the shared stack installation |
-| `validate` | Run remote validation |
-| `up` | `cluster-up + validate` |
-| `status` | Re-render and print `generated/cluster.json` |
-| `clean` | Remove local generated metadata |
-| `test-static` | Run only the `onprem-basic-arm` static validation path and record a local test manifest |
-| `test-contract` | Run only the `onprem-basic-arm` contract validation path and record a local test manifest |
-| `test-live` | Run only the `onprem-basic-arm` live validation path and record a local test manifest |
-| `test-clean` | Remove only the recorded matrix test artifacts for `onprem-basic-arm` |
-| `test-checkstatus` | Summarize only the recorded matrix test outcomes for `onprem-basic-arm` |
+```bash
+make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
+PRODUCTIVE_K3S_INFRA_REPO_DIR=../productive-k3s-infra make test-static PROFILE=multipass-1-server-2-agents
+```
 
-## AWS single-node targets
+## Scenario-local targets
 
-| Target | Purpose |
-| --- | --- |
-| `tofu-init` | Initialize the `OpenTofu` working directory |
-| `infra-up` | Create the AWS infrastructure and refresh metadata |
-| `infra-down` | Destroy the AWS infrastructure |
-| `preflight` | Validate the provisioned instance over `SSH`, copy the bundle, and run the remote Productive K3S Core host preflight when available |
-| `cluster-up` | Run the shared remote bootstrap flow |
-| `stack-up` | Re-run the shared stack installation |
-| `validate` | Run remote validation |
-| `up` | `infra-up + cluster-up + validate` |
-| `down` | `infra-down + clean` |
-| `status` | Print `generated/cluster.json` |
-| `test-static` | Run only the `aws-single-node` static validation path and record a local test manifest |
-| `test-contract` | Run only the `aws-single-node` contract validation path and record a local test manifest |
-| `test-live` | Run only the `aws-single-node` live validation path and record a local test manifest |
-| `test-clean` | Remove only the recorded matrix test artifacts for `aws-single-node` |
-| `test-checkstatus` | Summarize only the recorded matrix test outcomes for `aws-single-node` |
+Source-oriented scenario Makefiles still expose their own local entry points, for example:
+
+```bash
+make -C scenarios/local/multipass validate
+make -C scenarios/edge/onprem-basic validate
+make -C scenarios/cloud/aws-single-node infra-up
+```
+
+Those targets remain useful during authoring, but they are not the same thing as the root content-validation runner.
 
 ## Notes
 
 !!! note
-    The public package-first operator interface belongs to `pk3s` and `productive-k3s-infra`. This repository keeps the source-oriented targets that feed those published artifacts.
+    `make test-matrix` is the intended CI-friendly root validation surface for this repository.
 
 !!! note
-    `status` is important in this repository because generated metadata is part of the operating model, not just an internal implementation detail.
+    `make test-live` and `make test-live-matrix` are meant for maintainer-driven runtime validation before push or release.

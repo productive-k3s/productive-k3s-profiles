@@ -21,3 +21,4 @@ scenarios/*/*/runs/
 .tmp/
 .tmp-*/
 .live-*/
+test-artifacts/

@@ -1,6 +1,6 @@
 # Targets De Make
 
-`make` es la interfaz principal de desarrollo y authoring source-based de este repositorio.
+`make` es la interfaz principal de desarrollo y validación de contenido de este repositorio.
 
 Los profiles publicados se consumen a través de `pk3s` o `productive-k3s-infra`, no mediante un CLI de runtime propio en este repo:
 
@@ -9,7 +9,7 @@ pk3s infra install multipass-1-server-2-agents
 ./productive-k3s-infra.sh profile install --tgz ./multipass-1-server-2-agents.tgz
 ```
 
-Los targets de abajo siguen siendo deliberadamente source-based y están orientados a desarrollo del repositorio, CI y authoring de scenarios.
+Los targets raíz de abajo siguen siendo deliberadamente source-oriented y están orientados a desarrollo del repositorio, CI y authoring de scenarios.
 
 ## Targets de nivel raíz
 
@@ -19,111 +19,66 @@ Los targets de abajo siguen siendo deliberadamente source-based y están orienta
 | `make docs-serve` | Servir la documentación localmente |
 | `make docs-up` | Levantar el servidor de docs en background |
 | `make docs-down` | Detener el servidor de docs y limpiar artefactos |
-| `make test-clean` | Borrar artifacts locales de resultados de matriz antes de un nuevo ciclo de validación |
-| `make test-checkstatus` | Resumir los resultados de tests de matriz actualmente registrados en artifacts locales |
-| `make test-static` | Ejecutar checks static sobre todos los scenarios públicos |
-| `make test-contract` | Ejecutar checks contract sobre todos los scenarios públicos |
-| `make test-live` | Ejecutar validaciones live sobre todos los scenarios públicos |
-| `make test-live-onprem-arm` | Ejecutar sólo la validación live pública ARM mediante `scenarios/edge/onprem-basic-arm` |
-| `make test-live-gha-onprem` | Ejecutar la validación live single-node de `onprem-basic` sobre un runner hospedado por GitHub |
-| `make test-aws-localstack-contract` | Ejecutar la validación del contrato de infraestructura AWS single-node contra LocalStack |
-| `make test-matrix` | Ejecutar `static`, `contract` y `live` en secuencia |
-| `make scenario-up SCENARIO=...` | Ejecutar `up` sobre el escenario elegido mediante una única entrada genérica |
-| `make scenario-down SCENARIO=...` | Ejecutar `down` sobre el escenario elegido cuando ese escenario lo soporte |
-| `make scenario-status SCENARIO=...` | Ejecutar `status` sobre el escenario elegido |
-| `make scenario-infra-up SCENARIO=...` | Ejecutar `infra-up` sobre el escenario elegido cuando ese escenario lo soporte |
-| `make scenario-infra-down SCENARIO=...` | Ejecutar `infra-down` sobre el escenario elegido cuando ese escenario lo soporte |
-| `make multipass` | Ejecutar el flujo público default de `multipass` (`up`) |
-| `make onprem` | Ejecutar el flujo público default de `onprem-basic` (`up`) |
-| `make onprem-arm` | Ejecutar el flujo público default de `onprem-basic-arm` (`up`) |
-| `make aws-single-node` | Ejecutar el flujo público default de AWS single-node (`up`) |
+| `make test-static PROFILE=...` | Ejecutar sólo la suite `static` para el profile o scenario público elegido |
+| `make test-contract PROFILE=...` | Ejecutar sólo la suite `contract` para el profile o scenario público elegido |
+| `make test-live PROFILE=...` | Ejecutar sólo la suite `live` para el profile o scenario público elegido |
+| `make test-matrix` | Ejecutar `static + contract` sobre todos los scenarios públicos |
+| `make test-live-matrix` | Ejecutar `live` sobre todos los scenarios públicos |
 
-Valores aceptados para `SCENARIO`:
+Selectores soportados:
 
-- `multipass`
-- `onprem`
-- `onprem-arm`
-- `aws-single-node`
+- `PROFILE=<nombre-del-profile-publicado>`
+- `SCENARIO=<nombre-del-scenario-fuente>`
 
-Los aliases cortos de arriba son sólo wrappers de conveniencia para `up`. Los targets `scenario-...` son la interfaz genérica recomendada.
+Ejemplos:
 
-## Targets de Multipass
+```bash
+make test-static PROFILE=multipass-1-server-2-agents
+make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
+make test-live PROFILE=on-prem-basic INFRA_VERSION=0.9.62-0.9.4
+make test-static SCENARIO=onprem-basic
+make test-matrix
+```
 
-| Target | Propósito |
+## Selección del engine de Infra
+
+El runner raíz de tests valida el contenido fuente contra una versión elegida de `productive-k3s-infra`.
+
+Variables disponibles:
+
+| Variable | Propósito |
 | --- | --- |
-| `infra-init` | Inicializar el directorio de trabajo de `OpenTofu` |
-| `infra-up` | Crear las VMs y refrescar metadata generada |
-| `cluster-up` | Ejecutar el flujo de bootstrap multinodo |
-| `stack-up` | Reejecutar la instalación del stack compartido en el servidor |
-| `validate` | Ejecutar la validación del escenario |
-| `up` | `infra-up + cluster-up + validate` |
-| `down` | Destruir las VMs |
-| `clean` | Borrar artefactos generados y estado local de `OpenTofu` |
-| `status` | Re-renderizar e imprimir `generated/cluster.json` |
-| `test-static` | Ejecutar sólo la validación static de `multipass` y registrar un manifest local de test |
-| `test-contract` | Ejecutar sólo la validación contract de `multipass` y registrar un manifest local de test |
-| `test-live` | Ejecutar sólo la validación live de `multipass` y registrar un manifest local de test |
-| `test-clean` | Borrar sólo los artifacts registrados de tests de matriz para `multipass` |
-| `test-checkstatus` | Resumir sólo los resultados registrados de tests de matriz para `multipass` |
+| `INFRA_VERSION` | Clonar y usar una rama o tag publicada específica de `productive-k3s-infra` |
+| `PRODUCTIVE_K3S_INFRA_REPO_DIR` | Usar un checkout local de Infra en vez de clonar una release |
 
-## Targets de On-prem basic
+Comportamiento:
 
-| Target | Propósito |
-| --- | --- |
-| `preflight` | Validar reachability remoto y soporte de runtime, copiar el bundle y ejecutar el host preflight remoto de Productive K3S Core cuando esté disponible |
-| `cluster-up` | Ejecutar el bootstrap remoto sobre los nodos declarados |
-| `stack-up` | Reejecutar la instalación del stack compartido |
-| `validate` | Ejecutar validación remota |
-| `up` | `cluster-up + validate` |
-| `status` | Re-renderizar e imprimir `generated/cluster.json` |
-| `clean` | Borrar metadata generada local |
-| `test-static` | Ejecutar sólo la validación static de `onprem-basic` y registrar un manifest local de test |
-| `test-contract` | Ejecutar sólo la validación contract de `onprem-basic` y registrar un manifest local de test |
-| `test-live` | Ejecutar sólo la validación live de `onprem-basic` y registrar un manifest local de test |
-| `test-clean` | Borrar sólo los artifacts registrados de tests de matriz para `onprem-basic` |
-| `test-checkstatus` | Resumir sólo los resultados registrados de tests de matriz para `onprem-basic` |
+- si `PRODUCTIVE_K3S_INFRA_REPO_DIR` está seteado, el checkout local tiene prioridad
+- si omites `INFRA_VERSION`, el runner resuelve la última release publicada de `productive-k3s-infra`
 
-## Targets de On-prem basic ARM
+Ejemplos:
 
-| Target | Propósito |
-| --- | --- |
-| `preflight` | Validar reachability remoto y soporte de runtime, copiar el bundle y ejecutar el host preflight remoto de Productive K3S Core cuando esté disponible |
-| `cluster-up` | Ejecutar el bootstrap remoto sobre los nodos ARM declarados |
-| `stack-up` | Reejecutar la instalación del stack compartido |
-| `validate` | Ejecutar validación remota |
-| `up` | `cluster-up + validate` |
-| `status` | Re-renderizar e imprimir `generated/cluster.json` |
-| `clean` | Borrar metadata generada local |
-| `test-static` | Ejecutar sólo la validación static de `onprem-basic-arm` y registrar un manifest local de test |
-| `test-contract` | Ejecutar sólo la validación contract de `onprem-basic-arm` y registrar un manifest local de test |
-| `test-live` | Ejecutar sólo la validación live de `onprem-basic-arm` y registrar un manifest local de test |
-| `test-clean` | Borrar sólo los artifacts registrados de tests de matriz para `onprem-basic-arm` |
-| `test-checkstatus` | Resumir sólo los resultados registrados de tests de matriz para `onprem-basic-arm` |
+```bash
+make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
+PRODUCTIVE_K3S_INFRA_REPO_DIR=../productive-k3s-infra make test-static PROFILE=multipass-1-server-2-agents
+```
 
-## Targets de AWS single-node
+## Targets locales por scenario
 
-| Target | Propósito |
-| --- | --- |
-| `tofu-init` | Inicializar el directorio de trabajo de `OpenTofu` |
-| `infra-up` | Crear la infraestructura en AWS y refrescar metadata |
-| `infra-down` | Destruir la infraestructura en AWS |
-| `preflight` | Validar la instancia provisionada por `SSH`, copiar el bundle y ejecutar el host preflight remoto de Productive K3S Core cuando esté disponible |
-| `cluster-up` | Ejecutar el flujo compartido de bootstrap remoto |
-| `stack-up` | Reejecutar la instalación del stack compartido |
-| `validate` | Ejecutar validación remota |
-| `up` | `infra-up + cluster-up + validate` |
-| `down` | `infra-down + clean` |
-| `status` | Imprimir `generated/cluster.json` |
-| `test-static` | Ejecutar sólo la validación static de `aws-single-node` y registrar un manifest local de test |
-| `test-contract` | Ejecutar sólo la validación contract de `aws-single-node` y registrar un manifest local de test |
-| `test-live` | Ejecutar sólo la validación live de `aws-single-node` y registrar un manifest local de test |
-| `test-clean` | Borrar sólo los artifacts registrados de tests de matriz para `aws-single-node` |
-| `test-checkstatus` | Resumir sólo los resultados registrados de tests de matriz para `aws-single-node` |
+Los Makefiles source-oriented de cada scenario siguen exponiendo entrypoints locales, por ejemplo:
+
+```bash
+make -C scenarios/local/multipass validate
+make -C scenarios/edge/onprem-basic validate
+make -C scenarios/cloud/aws-single-node infra-up
+```
+
+Esos targets siguen siendo útiles durante el authoring, pero no son lo mismo que el runner raíz de validación de contenido.
 
 ## Notas
 
 !!! note
-    La interfaz pública package-first pertenece a `pk3s` y `productive-k3s-infra`. Este repositorio conserva los targets orientados a código fuente que alimentan esos artefactos publicados.
+    `make test-matrix` es la superficie raíz de validación friendly para CI en este repositorio.
 
 !!! note
-    `status` es importante en este repositorio porque la metadata generada forma parte del modelo operativo, no sólo de un detalle interno de implementación.
+    `make test-live` y `make test-live-matrix` están pensados para validación de runtime manejada por maintainers antes de un push o release.
