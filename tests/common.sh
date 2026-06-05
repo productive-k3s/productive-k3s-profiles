@@ -53,7 +53,7 @@ prepare_infra_checkout() {
   need_cmd git
   TEMP_INFRA_DIR="$(mktemp -d)"
   git clone --depth 1 --branch "${ref}" \
-    "${PRODUCTIVE_K3S_INFRA_REPO_URL:-git@github.com:jemacchi/productive-k3s-infra.git}" \
+    "${PRODUCTIVE_K3S_INFRA_REPO_URL:-https://github.com/jemacchi/productive-k3s-infra.git}" \
     "${TEMP_INFRA_DIR}" >/dev/null 2>&1 || fail "could not clone productive-k3s-infra ref ${ref}"
   INFRA_REPO_DIR="${TEMP_INFRA_DIR}"
 }
