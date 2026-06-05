@@ -14,7 +14,7 @@ ONPREM_ENV_FILE ?= $(SCENARIO_DIR)/onprem.env
 
 -include $(ONPREM_ENV_FILE)
 
-PRODUCTIVE_K3S_REPO ?= $(abspath $(SCENARIO_DIR)/../../../../productive-k3s-core)
+PRODUCTIVE_K3S_REPO ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../../productive-k3s-core)"; if [ -d "$$candidate" ]; then printf '%s' "$$candidate"; fi)
 PRODUCTIVE_K3S_SOURCE ?= remote
 PRODUCTIVE_K3S_VERSION ?=
 PRODUCTIVE_K3S_RELEASE_REPO ?= jemacchi/productive-k3s-core

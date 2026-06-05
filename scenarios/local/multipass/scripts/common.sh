@@ -15,7 +15,14 @@ else
   : "${PRODUCTIVE_K3S_CORE_VERSION_DEFAULT:=0.9.4}"
   : "${PRODUCTIVE_K3S_RELEASE_REPO_DEFAULT:=jemacchi/productive-k3s-core}"
 fi
-PRODUCTIVE_K3S_REPO="${PRODUCTIVE_K3S_REPO:-$(cd "${SCENARIO_DIR}/../../../../productive-k3s-core" && pwd)}"
+resolve_default_productive_k3s_repo() {
+  local candidate="${SCENARIO_DIR}/../../../../productive-k3s-core"
+  if [[ -d "${candidate}" ]]; then
+    (cd "${candidate}" && pwd)
+  fi
+}
+
+PRODUCTIVE_K3S_REPO="${PRODUCTIVE_K3S_REPO:-$(resolve_default_productive_k3s_repo)}"
 PRODUCTIVE_K3S_SOURCE="${PRODUCTIVE_K3S_SOURCE:-${PRODUCTIVE_K3S_SOURCE_DEFAULT}}"
 PRODUCTIVE_K3S_VERSION="${PRODUCTIVE_K3S_VERSION:-}"
 if [[ -z "${PRODUCTIVE_K3S_VERSION}" && "${PRODUCTIVE_K3S_SOURCE}" == "remote" ]]; then
@@ -38,6 +45,8 @@ TOFU_BIN="${TOFU_BIN:-}"
 MULTIPASS_EXEC_TIMEOUT_SECONDS="${MULTIPASS_EXEC_TIMEOUT_SECONDS:-30}"
 MULTIPASS_EXEC_RETRY_DELAY_SECONDS="${MULTIPASS_EXEC_RETRY_DELAY_SECONDS:-1}"
 MULTIPASS_EXEC_MAX_ATTEMPTS="${MULTIPASS_EXEC_MAX_ATTEMPTS:-3}"
+MULTIPASS_IPV4_MAX_ATTEMPTS="${MULTIPASS_IPV4_MAX_ATTEMPTS:-30}"
+MULTIPASS_IPV4_RETRY_DELAY_SECONDS="${MULTIPASS_IPV4_RETRY_DELAY_SECONDS:-2}"
 DEFAULT_REMOTE_DIR="/home/ubuntu/productive-k3s-core"
 MULTIPASS_SSH_USER="${MULTIPASS_SSH_USER:-ubuntu}"
 MULTIPASS_SSH_PORT="${MULTIPASS_SSH_PORT:-22}"
@@ -249,6 +258,29 @@ multipass_ipv4() {
   multipass info --format json "${name}" | jq -r --arg name "${name}" '
     .info[$name].ipv4[0] // empty
   '
+}
+
+multipass_wait_for_ipv4() {
+  local name="$1"
+  local attempts="${MULTIPASS_IPV4_MAX_ATTEMPTS}"
+  local delay="${MULTIPASS_IPV4_RETRY_DELAY_SECONDS}"
+  local attempt=1
+  local ipv4=""
+
+  while (( attempt <= attempts )); do
+    ipv4="$(multipass_ipv4 "${name}" || true)"
+    if [[ -n "${ipv4}" ]]; then
+      printf '%s\n' "${ipv4}"
+      return 0
+    fi
+
+    if (( attempt < attempts )); then
+      sleep "${delay}"
+    fi
+    ((attempt++))
+  done
+
+  return 1
 }
 
 multipass_state() {
