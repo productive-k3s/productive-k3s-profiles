@@ -77,7 +77,7 @@ fi
 
 all_names=("${server_name}" "${agent_names[@]}")
 
-server_ip="$(multipass_ipv4 "${server_name}")"
+server_ip="$(multipass_wait_for_ipv4 "${server_name}")"
 [[ -n "${server_ip}" ]] || {
   err "could not determine server IP for ${server_name}"
   exit 1
@@ -118,7 +118,7 @@ tmp_json="$(mktemp)"
   printf '  "agents": [\n'
   for i in "${!agent_names[@]}"; do
     agent_name="${agent_names[$i]}"
-    agent_ip="$(multipass_ipv4 "${agent_name}")"
+    agent_ip="$(multipass_wait_for_ipv4 "${agent_name}")"
     printf '    {"name": %s, "ipv4": %s}' \
       "$(jq -Rn --arg v "${agent_name}" '$v')" \
       "$(jq -Rn --arg v "${agent_ip}" '$v')"
@@ -131,7 +131,7 @@ tmp_json="$(mktemp)"
   printf '  "nodes": [\n'
   for i in "${!all_names[@]}"; do
     node_name="${all_names[$i]}"
-    node_ip="$(multipass_ipv4 "${node_name}")"
+    node_ip="$(multipass_wait_for_ipv4 "${node_name}")"
     role="agent"
     [[ "${node_name}" == "${server_name}" ]] && role="server"
     printf '    {"name": %s, "role": %s, "ipv4": %s}' \
@@ -167,7 +167,7 @@ mv "${tmp_json}" "${CLUSTER_JSON}"
   printf '    agents:\n'
   printf '      hosts:\n'
   for agent_name in "${agent_names[@]}"; do
-    agent_ip="$(multipass_ipv4 "${agent_name}")"
+    agent_ip="$(multipass_wait_for_ipv4 "${agent_name}")"
     printf '        %s:\n' "${agent_name}"
     printf '          ansible_host: %s\n' "${agent_ip}"
   done
