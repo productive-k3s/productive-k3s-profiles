@@ -161,9 +161,9 @@ validate_productive_k3s_bundle_archive() {
     "productive-k3s-core.sh"
     "scripts/productive-k3s-core.sh"
     "scripts/preflight-host.sh"
-    "scripts/bootstrap-k3s-stack.sh"
-    "scripts/backup-k3s-stack.sh"
-    "scripts/validate-k3s-stack.sh"
+    "scripts/apply.sh"
+    "scripts/backup.sh"
+    "scripts/validate.sh"
     "scripts/send-telemetry.sh"
   )
 

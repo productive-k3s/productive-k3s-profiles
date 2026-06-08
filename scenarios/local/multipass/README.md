@@ -155,6 +155,6 @@ That document is only an example workflow, but it is a practical way to confirm 
 
 - This flow does not currently update `/etc/hosts` on the control machine.
 - Rancher and registry are therefore guaranteed to resolve inside the VMs, but not automatically on the host.
-- The validation here is not the same as `productive-k3s/scripts/validate-k3s-stack.sh`, because that validator still assumes some single-node and host-local defaults such as NFS and fixed local hostnames.
+- The validation here is not the same as `productive-k3s/scripts/validate.sh`, because that validator still assumes some single-node and host-local defaults such as NFS and fixed local hostnames.
 - The first `Rancher` install can spend several minutes in `ContainerCreating` while each VM pulls the `rancher/rancher` image. That is expected on a cold cluster.
 - `stack-up` reconciles the default `StorageClass` for this scenario so that `longhorn` ends up as the only default class after the shared stack is installed.
