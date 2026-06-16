@@ -27,6 +27,9 @@ Rules:
 - `Expand Contract Validation Matrix`
   `Broaden contract checks against supported Infra versions so source content regressions are caught before artifact generation.`
 
+- `Centralize GitHub Owner and Infra/Core Release Sources`
+  `Replace hardcoded jemacchi URLs with repo-local defaults in tests/common.sh, scenarios/, profiles/, and docs/ so Infra and Core release sources survive an org move cleanly.`
+
 - `Review Live Test Scope`
   `Decide which live profile validations should stay manual and which should become expected maintainer pre-publish checks.`
 

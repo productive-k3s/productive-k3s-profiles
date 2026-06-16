@@ -29,6 +29,7 @@ if [[ -z "${PRODUCTIVE_K3S_VERSION}" && "${PRODUCTIVE_K3S_SOURCE}" == "remote" ]
   PRODUCTIVE_K3S_VERSION="${PRODUCTIVE_K3S_CORE_VERSION_DEFAULT}"
 fi
 PRODUCTIVE_K3S_RELEASE_REPO="${PRODUCTIVE_K3S_RELEASE_REPO:-${PRODUCTIVE_K3S_RELEASE_REPO_DEFAULT}}"
+PRODUCTIVE_K3S_DISTRO="${PRODUCTIVE_K3S_DISTRO:-k3s}"
 TELEMETRY_ENABLED="${TELEMETRY_ENABLED:-}"
 TELEMETRY_ENDPOINT="${TELEMETRY_ENDPOINT:-}"
 TELEMETRY_MARKER="${TELEMETRY_MARKER:-pk3s-public-v1}"
@@ -73,6 +74,28 @@ warn() {
 
 err() {
   printf '[ERROR] %s\n' "$*" >&2
+}
+
+productive_k3s_remote_kubectl_cmd() {
+  case "${PRODUCTIVE_K3S_DISTRO}" in
+    k3s) printf '%s' 'sudo k3s kubectl' ;;
+    rke2) printf '%s' 'sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml' ;;
+    *)
+      err "unsupported PRODUCTIVE_K3S_DISTRO: ${PRODUCTIVE_K3S_DISTRO}"
+      exit 1
+      ;;
+  esac
+}
+
+productive_k3s_remote_join_token_cmd() {
+  case "${PRODUCTIVE_K3S_DISTRO}" in
+    k3s) printf '%s' "sudo cat /var/lib/rancher/k3s/server/node-token | tr -d '\\r'" ;;
+    rke2) printf '%s' "sudo cat /var/lib/rancher/rke2/server/node-token | tr -d '\\r'" ;;
+    *)
+      err "unsupported PRODUCTIVE_K3S_DISTRO: ${PRODUCTIVE_K3S_DISTRO}"
+      exit 1
+      ;;
+  esac
 }
 
 json_escape() {

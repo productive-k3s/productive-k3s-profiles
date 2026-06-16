@@ -7,6 +7,7 @@ ensure_base_requirements
 ensure_logs_dir
 load_cluster_metadata
 export_resolved_telemetry_env
+KUBECTL_CMD="$(productive_k3s_remote_kubectl_cmd)"
 
 if [[ ! -f "${SERVER_TOKEN_FILE}" ]]; then
   err "missing ${SERVER_TOKEN_FILE}; run bootstrap-server first"
@@ -39,5 +40,5 @@ for i in "${!AGENT_IPS[@]}"; do
     --log-file "${LOG_DIR}/bootstrap-${agent_name}.log"
 done
 
-remote_exec "${SERVER_IP}" "sudo k3s kubectl wait --for=condition=Ready node --all --timeout=10m"
+remote_exec "${SERVER_IP}" "${KUBECTL_CMD} wait --for=condition=Ready node --all --timeout=10m"
 log "Agent bootstrap completed"

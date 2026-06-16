@@ -5,13 +5,14 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 ensure_base_requirements
 load_cluster_metadata
+KUBECTL_CMD="$(productive_k3s_remote_kubectl_cmd)"
 
 expected_nodes="${1:-$((1 + ${#AGENT_NAMES[@]}))}"
 timeout_seconds="${2:-600}"
 deadline=$((SECONDS + timeout_seconds))
 
 while (( SECONDS < deadline )); do
-  nodes_output="$(ssh_exec_with_timeout "${SERVER_IP}" 20 "sudo k3s kubectl get nodes --no-headers" 2>/dev/null || true)"
+  nodes_output="$(ssh_exec_with_timeout "${SERVER_IP}" 20 "${KUBECTL_CMD} get nodes --no-headers" 2>/dev/null || true)"
   node_count="$(printf '%s\n' "${nodes_output}" | awk 'NF {count++} END {print count+0}')"
   ready_count="$(printf '%s\n' "${nodes_output}" | awk '$2 == "Ready" {count++} END {print count+0}')"
 
@@ -24,5 +25,5 @@ while (( SECONDS < deadline )); do
 done
 
 err "Timed out waiting for ${expected_nodes} Ready nodes"
-ssh_exec_with_timeout "${SERVER_IP}" 20 "sudo k3s kubectl get nodes -o wide" || true
+ssh_exec_with_timeout "${SERVER_IP}" 20 "${KUBECTL_CMD} get nodes -o wide" || true
 exit 1
