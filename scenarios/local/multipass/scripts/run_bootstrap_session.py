@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -31,6 +32,16 @@ ENGINE_ENV_KEYS = [
     "PRODUCTIVE_K3S_SSH_KEY_PATH",
     "PRODUCTIVE_K3S_SSH_EXTRA_OPTS",
 ]
+
+ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+
+
+def sanitize_prompt_buffer(value: str) -> str:
+    value = ANSI_ESCAPE_RE.sub("", value)
+    value = value.replace("\r", "")
+    while "\b" in value:
+        value = re.sub(r".\b", "", value, count=1)
+    return value
 
 
 def telemetry_env_prefix():
@@ -154,12 +165,13 @@ def main():
                 log_handle.write(ch)
                 log_handle.flush()
             buffer = (buffer + ch)[-6000:]
+            normalized_buffer = sanitize_prompt_buffer(buffer)
             if pending:
                 matched_index = None
                 matched_prompt = None
                 matched_answer = None
                 for idx, (prompt_text, answer) in enumerate(pending):
-                    if prompt_text in buffer:
+                    if prompt_text in normalized_buffer:
                         matched_index = idx
                         matched_prompt = prompt_text
                         matched_answer = answer
