@@ -11,12 +11,18 @@ validate_productive_k3s_source
 mkdir -p "${GENERATED_DIR}"
 archive="$(mktemp "${HOME}/pk3s-productive-k3s-bundle-XXXXXX.tgz")"
 extracted_subdir=""
-trap 'rm -f "${archive}"' EXIT
+addons_archive=""
+addons_extracted_subdir=""
+trap 'rm -f "${archive}" "${addons_archive}"' EXIT
 
 case "${PRODUCTIVE_K3S_SOURCE_RESOLVED}" in
   local)
     [[ -d "${PRODUCTIVE_K3S_REPO}" ]] || {
       err "productive-k3s-core repo not found at ${PRODUCTIVE_K3S_REPO}"
+      exit 1
+    }
+    [[ -d "${PRODUCTIVE_K3S_ADDONS_REPO_DIR}" ]] || {
+      err "productive-k3s-addons repo not found at ${PRODUCTIVE_K3S_ADDONS_REPO_DIR:-<unset>}"
       exit 1
     }
     log "Packing local productive-k3s-core from ${PRODUCTIVE_K3S_REPO}"
@@ -29,6 +35,17 @@ case "${PRODUCTIVE_K3S_SOURCE_RESOLVED}" in
       "$(basename "${PRODUCTIVE_K3S_REPO}")"
     chmod 0644 "${archive}"
     extracted_subdir="$(basename "${PRODUCTIVE_K3S_REPO}")"
+    addons_archive="$(mktemp "${HOME}/pk3s-productive-k3s-addons-XXXXXX.tgz")"
+    log "Packing local productive-k3s-addons from ${PRODUCTIVE_K3S_ADDONS_REPO_DIR}"
+    tar \
+      --exclude='.git' \
+      --exclude='test-artifacts' \
+      --exclude='.codex' \
+      -C "$(dirname "${PRODUCTIVE_K3S_ADDONS_REPO_DIR}")" \
+      -czf "${addons_archive}" \
+      "$(basename "${PRODUCTIVE_K3S_ADDONS_REPO_DIR}")"
+    chmod 0644 "${addons_archive}"
+    addons_extracted_subdir="$(basename "${PRODUCTIVE_K3S_ADDONS_REPO_DIR}")"
     ;;
   remote)
     download_productive_k3s_release_bundle "${archive}" "${PRODUCTIVE_K3S_VERSION_RESOLVED}"
@@ -47,6 +64,9 @@ for node in "${ALL_NODE_NAMES[@]}"; do
   log "Copying productive-k3s (${PRODUCTIVE_K3S_SOURCE_RESOLVED}) to ${node}"
   mp_exec "${node}" "rm -rf '${REMOTE_DIR}' && mkdir -p '$(dirname "${REMOTE_DIR}")'"
   mp_transfer_to "${archive}" "${node}" "/tmp/productive-k3s.tgz"
+  if [[ -n "${addons_archive}" ]]; then
+    mp_transfer_to "${addons_archive}" "${node}" "/tmp/productive-k3s-addons.tgz"
+  fi
   mp_exec "${node}" "
     set -euo pipefail
     extracted_dir='$(dirname "${REMOTE_DIR}")/${extracted_subdir}'
@@ -57,6 +77,12 @@ for node in "${ALL_NODE_NAMES[@]}"; do
       mv \"\${extracted_dir}\" '${REMOTE_DIR}'
     fi
     rm -f /tmp/productive-k3s.tgz
+    if [[ -f /tmp/productive-k3s-addons.tgz ]]; then
+      addons_dir='$(dirname "${REMOTE_DIR}")/${addons_extracted_subdir}'
+      rm -rf \"\${addons_dir}\"
+      tar -xzf /tmp/productive-k3s-addons.tgz -C '$(dirname "${REMOTE_DIR}")'
+      rm -f /tmp/productive-k3s-addons.tgz
+    fi
   "
 done
 
