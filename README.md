@@ -24,6 +24,14 @@ make docs-build
 make docs-serve
 ```
 
+Detailed docs lifecycle commands live under `docs/`:
+
+```bash
+make -C docs docs-up
+make -C docs docs-down
+make -C docs docs-clean
+```
+
 ## Content validation
 
 This repository can validate its own public content against a selected version of the `productive-k3s-infra` engine.
@@ -31,17 +39,15 @@ This repository can validate its own public content against a selected version o
 Examples:
 
 ```bash
-make test-static PROFILE=multipass-1-server-2-agents
-make test-contract PROFILE=aws-single-node-basic INFRA_VERSION=0.9.62-0.9.4
-make test-live PROFILE=on-prem-basic INFRA_VERSION=0.9.62-0.9.4
 PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/jemacchi/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-matrix
-make test-matrix
+PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/jemacchi/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-live-matrix
 ```
 
 Behavior:
 
 - `test-matrix` runs `static + contract`
-- `test-live` is intended for manual pre-push validation
+- `test-live-matrix` runs live validation across every discovered scenario
+- detailed targets like `test-static`, `test-contract`, and `test-live` live under `tests/`
 - if `PRODUCTIVE_K3S_INFRA_REPO_URL` and/or `PRODUCTIVE_K3S_INFRA_REPO_REF` are set, the runner clones that repo/ref
 - otherwise, if `INFRA_VERSION` is set, the runner clones that exact ref
 - otherwise, the runner resolves the latest released `productive-k3s-infra`
