@@ -8,6 +8,7 @@ SCRIPTS_DIR := $(SCENARIO_DIR)/scripts
 TESTS_DIR := $(SCENARIO_DIR)/../../../tests
 DEV_SCRIPTS_DIR := $(SCENARIO_DIR)/../../../scripts
 TOFU_BIN ?= $(shell if command -v tofu >/dev/null 2>&1; then echo tofu; elif command -v terraform >/dev/null 2>&1; then echo terraform; fi)
+TOFU_APPLY_PARALLELISM ?=
 
 export PRODUCTIVE_K3S_REPO ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../productive-k3s-core)"; if [ -d "$$candidate" ]; then printf '%s' "$$candidate"; fi)
 export PRODUCTIVE_K3S_SOURCE ?= remote
@@ -27,7 +28,7 @@ infra-init:
 	$(TOFU_BIN) -chdir=$(OPENTOFU_DIR) init
 
 infra-up: infra-init
-	$(TOFU_BIN) -chdir=$(OPENTOFU_DIR) apply -auto-approve
+	$(TOFU_BIN) -chdir=$(OPENTOFU_DIR) apply $(if $(TOFU_APPLY_PARALLELISM),-parallelism=$(TOFU_APPLY_PARALLELISM),) -auto-approve
 	$(SCRIPTS_DIR)/refresh-generated-artifacts.sh
 
 cluster-up:
