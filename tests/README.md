@@ -11,8 +11,8 @@ Supported suites:
 Use the root entrypoints for the main flows:
 
 ```bash
-PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/jemacchi/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-matrix
-PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/jemacchi/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-live-matrix
+PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/productive-k3s/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-matrix
+PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/productive-k3s/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-live-matrix
 ```
 
 Artifacts and status helpers:

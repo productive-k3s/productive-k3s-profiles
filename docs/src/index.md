@@ -14,10 +14,10 @@ sublead: "It owns authoring, defaults, helper scripts, and scenario contracts, w
 sublead_es: "Es dueño del authoring, defaults, scripts auxiliares y contratos de scenarios, mientras que Productive K3S Infra sigue siendo el engine de runtime y Productive K3S Core la capa de bootstrap del clúster."
 primary_label: "View on GitHub"
 primary_label_es: "Ver en GitHub"
-primary_url: "https://github.com/jemacchi/productive-k3s-profiles"
+primary_url: "https://github.com/productive-k3s/productive-k3s-profiles"
 secondary_label: "Open README"
 secondary_label_es: "Abrir README"
-secondary_url: "https://github.com/jemacchi/productive-k3s-profiles/blob/main/README.md"
+secondary_url: "https://github.com/productive-k3s/productive-k3s-profiles/blob/main/README.md"
 card_title: "What it does"
 card_title_es: "Qué hace"
 card_items:

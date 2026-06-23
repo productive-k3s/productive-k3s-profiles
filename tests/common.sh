@@ -46,7 +46,7 @@ resolve_default_infra_ref() {
 resolve_latest_infra_release() {
   need_cmd curl
   need_cmd jq
-  curl -fsSL "https://api.github.com/repos/jemacchi/productive-k3s-infra/releases/latest" | jq -r '.tag_name // empty'
+  curl -fsSL "https://api.github.com/repos/productive-k3s/productive-k3s-infra/releases/latest" | jq -r '.tag_name // empty'
 }
 
 prepare_infra_checkout() {
@@ -58,7 +58,7 @@ prepare_infra_checkout() {
     return 0
   fi
 
-  local repo_url="${PRODUCTIVE_K3S_INFRA_REPO_URL:-https://github.com/jemacchi/productive-k3s-infra.git}"
+  local repo_url="${PRODUCTIVE_K3S_INFRA_REPO_URL:-https://github.com/productive-k3s/productive-k3s-infra.git}"
   local ref=""
   if [[ -n "${PRODUCTIVE_K3S_INFRA_REPO_URL:-}" || -n "${PRODUCTIVE_K3S_INFRA_REPO_REF:-}" ]]; then
     ref="$(resolve_default_infra_ref)"

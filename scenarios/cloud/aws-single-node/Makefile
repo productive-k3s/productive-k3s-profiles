@@ -20,7 +20,7 @@ TOFU_BIN ?= $(shell if command -v tofu >/dev/null 2>&1; then echo tofu; elif com
 PRODUCTIVE_K3S_REPO ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../productive-k3s-core)"; if [ -d "$$candidate" ]; then printf '%s' "$$candidate"; fi)
 PRODUCTIVE_K3S_SOURCE ?= remote
 PRODUCTIVE_K3S_VERSION ?=
-PRODUCTIVE_K3S_RELEASE_REPO ?= jemacchi/productive-k3s-core
+PRODUCTIVE_K3S_RELEASE_REPO ?= productive-k3s/productive-k3s-core
 TELEMETRY_ENABLED ?=
 TELEMETRY_ENDPOINT ?=
 TELEMETRY_MAX_RETRIES ?= 3

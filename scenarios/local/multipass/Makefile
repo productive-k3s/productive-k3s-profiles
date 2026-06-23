@@ -13,7 +13,7 @@ TOFU_APPLY_PARALLELISM ?=
 export PRODUCTIVE_K3S_REPO ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../productive-k3s-core)"; if [ -d "$$candidate" ]; then printf '%s' "$$candidate"; fi)
 export PRODUCTIVE_K3S_SOURCE ?= remote
 export PRODUCTIVE_K3S_VERSION ?=
-export PRODUCTIVE_K3S_RELEASE_REPO ?= jemacchi/productive-k3s-core
+export PRODUCTIVE_K3S_RELEASE_REPO ?= productive-k3s/productive-k3s-core
 export TELEMETRY_ENABLED ?=
 export TELEMETRY_ENDPOINT ?=
 export TELEMETRY_MAX_RETRIES ?= 3
