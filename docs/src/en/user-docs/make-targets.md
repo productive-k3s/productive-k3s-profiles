@@ -9,7 +9,7 @@ pk3s infra install multipass-1-server-2-agents
 ./productive-k3s-infra.sh profile install --tgz ./multipass-1-server-2-agents.tgz
 ```
 
-The root targets below are intentionally source-oriented and are aimed at repository development, CI, and scenario authoring.
+The root targets below are intentionally source-oriented and are aimed at repository development, CI, and scenario maintenance.
 
 ## Root-level targets
 
@@ -65,7 +65,7 @@ PRODUCTIVE_K3S_INFRA_REPO_DIR=../productive-k3s-infra make test-static PROFILE=m
 
 ## Scenario-local targets
 
-Source-oriented scenario Makefiles still expose their own local entry points, for example:
+Source-oriented scenario Makefiles still expose their own local command paths, for example:
 
 ```bash
 make -C scenarios/local/multipass validate
@@ -73,7 +73,7 @@ make -C scenarios/edge/onprem-basic validate
 make -C scenarios/cloud/aws-single-node infra-up
 ```
 
-Those targets remain useful during authoring, but they are not the same thing as the root content-validation runner.
+Those targets remain useful during maintenance, but they are not the same thing as the root content-validation runner.
 
 ## Notes
 

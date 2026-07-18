@@ -2,7 +2,7 @@
 
 `onprem-basic-arm` bootstraps `productive-k3s-core` onto ARM machines that already exist and are reachable over `SSH`.
 
-This path is intentionally separate from the generic `onprem-basic` scenario so ARM users get a public entrypoint with explicit preparation steps and validation notes instead of inferring them from the broader on-prem documentation.
+This path is intentionally separate from the generic `onprem-basic` scenario so ARM users get a public ARM path with explicit preparation steps and validation notes instead of inferring them from the broader on-prem documentation.
 
 ## What it expects
 

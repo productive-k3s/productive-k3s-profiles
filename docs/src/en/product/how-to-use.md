@@ -1,6 +1,8 @@
 # How To Use Productive K3S Profiles
 
-`productive-k3s-profiles` is the public source repository for profile and scenario content. In normal user-facing flows, operators consume published `profile.tgz` artifacts through `pk3s` or `productive-k3s-infra`; they do not execute this repository directly.
+`productive-k3s-profiles` is where you choose the curated deployment solution path that best matches your platform.
+
+In the normal user-facing flow, operators consume those curated paths through `pk3s` or `productive-k3s-infra`; they do not usually execute this repository directly first.
 
 ## Choose the matching profile
 
@@ -55,7 +57,7 @@ Outside that scope, especially in custom or manually orchestrated combinations, 
 
 ## Consume published profiles
 
-The normal end-user path is package-first:
+The normal end-user path is to choose a curated solution and let Infra or CLI execute it:
 
 ```bash
 pk3s profile show multipass-1-server-2-agents
@@ -81,9 +83,9 @@ Most public scenarios support two source modes:
 
 If `remote` is used, `PRODUCTIVE_K3S_VERSION` can pin a specific release. If it is omitted, the scenario resolves the latest release from `PRODUCTIVE_K3S_RELEASE_REPO`.
 
-## Use the development entry points
+## Use the development paths
 
-Source-based `.env` profiles remain valid here for authoring, CI, and compatibility testing against the Infra engine.
+Source-based `.env` profiles remain valid here for repository development, CI, and compatibility testing against the Infra engine.
 
 Development examples:
 

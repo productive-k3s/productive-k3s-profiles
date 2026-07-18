@@ -33,7 +33,7 @@ Eso implica que el código público debería preferir:
 
 - supuestos genéricos
 - inputs de operador documentados
-- entrypoints explícitos de `Makefile`
+- caminos explícitos de `Makefile`
 - capas reutilizables que no dependan de un entorno de cliente particular
 
 ## Notas

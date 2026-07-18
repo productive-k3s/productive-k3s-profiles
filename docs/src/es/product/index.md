@@ -1,20 +1,22 @@
-# Resumen Del Producto
+# Resumen del producto
 
-`productive-k3s-profiles` es el repositorio fuente público de profiles y scenarios de Productive K3S.
+`productive-k3s-profiles` es donde viven las soluciones curadas de despliegue de Productive K3S.
+
+Si querés primero los caminos listos para usar, empezá acá.
+
+Hoy los caminos públicos recomendados incluyen:
+
+- `onprem-basic` para hosts existentes alcanzables por `SSH`
+- `aws-single-node` para un camino simple de evaluación en cloud
+
+Detrás de esa vista de producto, este repositorio también es el catálogo público de profiles y scenarios que consume `productive-k3s-infra`.
 
 No reemplaza:
 
 - `productive-k3s-core`, que sigue siendo dueño del bootstrap del clúster
-- `productive-k3s-infra`, que sigue siendo dueño del engine de runtime que ejecuta profiles empaquetados
+- `productive-k3s-infra`, que sigue siendo dueño del engine de despliegue y orquestación
 
-Este repositorio es dueño de la superficie pública de authoring que después alimenta los artefactos `profile.tgz` publicados:
-
-- `profiles/` fuente
-- `scenarios/` fuente
-- defaults y scripts auxiliares por escenario
-- sidecars de metadata de paquete como `*.package.yaml`
-
-En las páginas siguientes podés ver para qué sirve este repositorio, cómo se relaciona con el engine de Infra y cómo debe authoring y consumirse el contenido público de profiles/scenarios.
+En las páginas siguientes podés ver los caminos disponibles, cómo se relacionan con Infra y Core, y cómo se construye y consume la capa pública de soluciones.
 
 ## Páginas
 

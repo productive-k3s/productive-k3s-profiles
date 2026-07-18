@@ -1,6 +1,6 @@
 # AWS Single-Node Scenario
 
-`aws-single-node` is the public AWS entry point of this repository.
+`aws-single-node` is the public AWS path of this repository.
 
 It provisions one `EC2` instance with `OpenTofu`, then bootstraps `productive-k3s-core` onto it over `SSH`.
 

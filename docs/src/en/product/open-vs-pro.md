@@ -33,7 +33,7 @@ That means the public code should prefer:
 
 - generic assumptions
 - documented operator inputs
-- explicit `Makefile` entry points
+- explicit `Makefile` paths
 - reusable layers that are not tied to a single customer environment
 
 ## Notes

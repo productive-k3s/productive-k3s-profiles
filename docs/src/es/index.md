@@ -1,8 +1,8 @@
 # Documentación en español
 
-Este es el punto de entrada en español para la documentación de Productive K3S Profiles.
+Este es el camino principal en español para la documentación de Productive K3S Profiles.
 
-Usá este árbol cuando quieras leer la documentación fuente de los profiles públicos, sus scenarios y el modelo de authoring asociado.
+Usá este árbol cuando quieras recorrer las soluciones curadas de despliegue de Productive K3S y entender cómo se mantienen esos caminos públicos.
 
 ## Empezar por acá
 
@@ -15,6 +15,6 @@ Usá este árbol cuando quieras leer la documentación fuente de los profiles p�
 - [Cómo usar Productive K3S Profiles](product/how-to-use.md)
 - [Relación con Productive K3S Infra y Core](product/productive-k3s-relationship.md)
 - [Escenario Multipass](user-docs/multipass.md)
-- [Targets de Make](user-docs/make-targets.md)
+- [Objetivos de Make](user-docs/make-targets.md)
 - [Tests y matriz](developer-docs/guides/testing-and-matrix.md)
 - [Flujo de documentación](developer-docs/guides/documentation-workflow.md)

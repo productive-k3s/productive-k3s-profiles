@@ -2,7 +2,7 @@
 
 This scenario bootstraps `productive-k3s-core` onto ARM machines that already exist and are reachable over SSH.
 
-It is a public ARM-oriented entrypoint built on top of the same reusable remote bootstrap layer as `onprem-basic`. The difference is clarity: this page documents the Raspberry Pi style preparation steps and the ARM-specific validation evidence explicitly, instead of making users infer them from the generic on-prem path.
+It is a public ARM-oriented path built on top of the same reusable remote bootstrap layer as `onprem-basic`. The difference is clarity: this page documents the Raspberry Pi style preparation steps and the ARM-specific validation evidence explicitly, instead of making users infer them from the generic on-prem path.
 
 Internally, `onprem-basic-arm` still uses the reusable remote bootstrap layer under `ansible/roles/remote_cluster`.
 

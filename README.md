@@ -1,15 +1,16 @@
 # Productive K3S Profiles
 
-**Productive K3S Profiles** is the public source repository for Productive K3S infrastructure profiles and scenarios.
+**Productive K3S Profiles** is where the curated deployment solutions of Productive K3S live.
 
-This repository contains the authoring surface for:
+If you want ready-to-use paths first, this is the solution layer to look at.
 
-- public `profiles/`
-- public `scenarios/`
-- scenario-specific helper scripts
-- package metadata sidecars such as `*.package.yaml`
+Recommended public paths today include:
 
-It is the source-of-truth content repository used by `productive-k3s-ops` to generate published `profile.tgz` artifacts.
+- `onprem-basic` for existing hosts reachable through `SSH`
+- `aws-single-node-basic` for a simple cloud evaluation path
+- `multipass-1-server-2-agents` for a local multi-node path
+
+Behind that product view, this repository contains the public `profiles/`, `scenarios/`, package metadata, and helper assets used to generate published `profile.tgz` artifacts.
 
 ## Documentation
 
@@ -52,14 +53,14 @@ Behavior:
 - otherwise, if `INFRA_VERSION` is set, the runner clones that exact ref
 - otherwise, the runner resolves the latest released `productive-k3s-infra`
 
-## Relationship with the Infra engine
+## Relationship with the rest of the ecosystem
 
-- `productive-k3s-infra` is the Infra engine/runtime.
-- `productive-k3s-profiles` is the public source content for profiles and scenarios.
-- `productive-k3s-ops` reads this repository to package and publish profile artifacts.
+- `productive-k3s-infra` executes these curated deployment solutions.
+- `productive-k3s-core` remains responsible for the Kubernetes base bootstrap.
+- `productive-k3s-ops` packages and publishes the resulting profile artifacts.
 - `pk3s` consumes the published artifacts and does not depend on this repository directly.
 
-The goal of this split is to avoid coupling every profile/scenario change to a new Infra engine bundle.
+The goal of this split is to keep curated solutions evolving independently from the Infra release cadence.
 
 ## Repository structure
 
