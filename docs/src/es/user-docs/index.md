@@ -1,6 +1,6 @@
 # Documentación Para Usuarios
 
-Esta sección agrupa los scenarios públicos, sus entrypoints principales de `make` y las referencias compartidas del árbol fuente mantenido por `productive-k3s-profiles`.
+Esta sección agrupa los scenarios públicos, sus caminos principales de `make` y las referencias compartidas mantenidas por `productive-k3s-profiles`.
 
 ## Páginas
 
@@ -13,6 +13,6 @@ Esta sección agrupa los scenarios públicos, sus entrypoints principales de `ma
 
 ### Referencias compartidas
 
-- [ARM Support](arm-support.md)
-- [Targets de Make](make-targets.md)
+- [Soporte ARM](arm-support.md)
+- [Objetivos de Make](make-targets.md)
 - [Modos de Productive K3S Core](productive-k3s-modes.md)

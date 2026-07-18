@@ -4,14 +4,14 @@ template: "home.html"
 hide:
   - navigation
   - toc
-eyebrow: "Public profile and scenario sources for Productive K3S"
-eyebrow_es: "Fuentes públicas de profiles y scenarios de Productive K3S"
+eyebrow: "Curated deployment solutions ready to use"
+eyebrow_es: "Soluciones curadas de despliegue listas para usar"
 hero_title: "Productive K3S Profiles"
 hero_title_es: "Productive K3S Profiles"
-lead: "Productive K3S Profiles is the public source-of-truth repository for profile and scenario content that later becomes published self-contained profile artifacts."
-lead_es: "Productive K3S Profiles es el repositorio fuente público para el contenido de profiles y scenarios que luego se publica como artefactos autocontenidos."
-sublead: "It owns authoring, defaults, helper scripts, and scenario contracts, while Productive K3S Infra remains the runtime engine and Productive K3S Core remains the cluster bootstrap layer."
-sublead_es: "Es dueño del authoring, defaults, scripts auxiliares y contratos de scenarios, mientras que Productive K3S Infra sigue siendo el engine de runtime y Productive K3S Core la capa de bootstrap del clúster."
+lead: "Productive K3S Profiles gives you curated deployment solutions that Productive K3S Infra can execute over different platforms."
+lead_es: "Productive K3S Profiles te da soluciones curadas de despliegue que Productive K3S Infra puede ejecutar sobre distintas plataformas."
+sublead: "Use this repository to choose recommended solution paths such as existing on-prem infrastructure over SSH or a simple AWS single-node evaluation, while Infra keeps the orchestration layer and Core keeps the base installation contract."
+sublead_es: "Usá este repositorio para elegir caminos recomendados de solución como infraestructura on-prem existente vía SSH o una evaluación simple de AWS single-node, mientras Infra mantiene la capa de orquestación y Core el contrato base de instalación."
 primary_label: "View on GitHub"
 primary_label_es: "Ver en GitHub"
 primary_url: "https://github.com/productive-k3s/productive-k3s-profiles"
@@ -21,85 +21,85 @@ secondary_url: "https://github.com/productive-k3s/productive-k3s-profiles/blob/m
 card_title: "What it does"
 card_title_es: "Qué hace"
 card_items:
-  - Defines public profile defaults and package metadata
-  - Owns public scenario implementations and helper assets
-  - Validates scenario content before it becomes a published profile artifact
+  - Defines curated deployment solutions ready to execute through Infra
+  - Packages platform decisions, defaults, and helper assets into reusable paths
+  - Keeps the public solution catalog separate from the deployment engine
 card_items_es:
-  - Define defaults públicos de profiles y metadata de paquete
-  - Es dueño de las implementaciones públicas de scenarios y sus assets auxiliares
-  - Valida el contenido de scenarios antes de convertirlo en artefactos de profile publicados
+  - Define soluciones curadas de despliegue listas para ejecutarse con Infra
+  - Empaqueta decisiones de plataforma, defaults y assets auxiliares en caminos reutilizables
+  - Mantiene separado el catálogo público de soluciones respecto del engine de despliegue
 why_title: "Why it exists"
 why_title_es: "Por qué existe"
 why_options:
-  - label: "DIY INFRASTRUCTURE"
-    text: "Raw infrastructure scripts are flexible, but hard to reuse, review, and publish consistently."
-  - label: "ENGINE OWNERSHIP"
-    text: "Bundling all public scenarios into the runtime engine makes every scenario change heavier than it needs to be."
+  - label: "CURATED PATHS"
+    text: "Teams want ready-to-use solution paths instead of rebuilding the same deployment decisions every time."
+  - label: "SEPARATE LAYERS"
+    text: "The solutions should evolve without forcing the deployment engine and the base installation layer to absorb all the change."
 why_options_es:
-  - label: "INFRAESTRUCTURA DIY"
-    text: "Los scripts crudos de infraestructura son flexibles, pero difíciles de reutilizar, revisar y publicar de forma consistente."
-  - label: "OWNERSHIP DEL ENGINE"
-    text: "Meter todos los scenarios públicos dentro del engine de runtime vuelve cada cambio más pesado de lo necesario."
-bridge_note: "Productive K3S Profiles provides the content layer: repeatable, reviewable source material that the Infra engine can execute."
-bridge_note_es: "Productive K3S Profiles aporta la capa de contenido: material fuente repetible y auditable que luego puede ejecutar el engine de Infra."
+  - label: "CAMINOS CURADOS"
+    text: "Los equipos quieren caminos de solución listos para usar en lugar de reconstruir siempre las mismas decisiones de despliegue."
+  - label: "CAPAS SEPARADAS"
+    text: "Las soluciones deben poder evolucionar sin obligar al engine de despliegue ni a la capa base de instalación a absorber todos los cambios."
+bridge_note: "Productive K3S Profiles is the curated solution layer in the ecosystem."
+bridge_note_es: "Productive K3S Profiles es la capa de soluciones curadas dentro del ecosistema."
 bridge_points:
-  - Keep Productive K3S Core as the bootstrap contract
-  - Keep Productive K3S Infra as the runtime engine
-  - Evolve scenarios without forcing engine bundle releases
+  - Keep Core as the base installation contract
+  - Keep Infra as the orchestration engine
+  - Let curated solution paths evolve on their own cadence
 bridge_points_es:
-  - Mantener Productive K3S Core como contrato de bootstrap
-  - Mantener Productive K3S Infra como engine de runtime
-  - Evolucionar scenarios sin forzar releases del bundle del engine
-scenarios_title: "Target scenarios"
-scenarios_title_es: "Escenarios objetivo"
+  - Mantener a Core como contrato base de instalación
+  - Mantener a Infra como engine de orquestación
+  - Dejar que los caminos curados de solución evolucionen a su propio ritmo
+scenarios_title: "Recommended paths"
+scenarios_title_es: "Caminos recomendados"
 scenarios:
-  - Local multi-node validation with Multipass
-  - Existing hosts reachable over SSH
-  - Basic single-node cloud evaluation on AWS
-  - Teams that want reusable source content before their own hardening
+  - "On-prem basic: deploy over existing hosts reachable through SSH"
+  - "AWS single-node: evaluate a simple cloud path on EC2"
+  - "Multipass: validate a local multi-node path before going further"
+  - "ARM path: keep an explicit public route for smaller ARM targets"
 scenarios_es:
-  - Validación local multinodo con Multipass
-  - Hosts existentes alcanzables por SSH
-  - Evaluación cloud básica de nodo único en AWS
-  - Equipos que quieren contenido reutilizable antes de su propio hardening
+  - "On-prem basic: desplegá sobre hosts existentes alcanzables por SSH"
+  - "AWS single-node: evaluá un camino cloud simple sobre EC2"
+  - "Multipass: validá un camino local multinodo antes de avanzar"
+  - "ARM path: mantené una ruta pública explícita para objetivos ARM más chicos"
 principles_title: "Design principles"
 principles_title_es: "Principios de diseño"
 principles:
-  - title: "Profiles and scenarios first"
-    text: "the public source tree should describe real deployment paths, not disconnected fragments"
-  - title: "Keep runtime separate"
-    text: "the execution engine and the source tree should evolve independently"
-  - title: "Stay explicit"
-    text: "defaults, helper scripts, and package metadata should be obvious to review"
+  - title: "Curated over ad hoc"
+    text: "publish solution paths that feel ready to use, not disconnected fragments"
+  - title: "Keep orchestration separate"
+    text: "Infra executes the solutions, but does not own the solution catalog"
+  - title: "Keep the contracts visible"
+    text: "defaults, helper scripts, and packaging metadata should remain reviewable"
 principles_es:
-  - title: "Profiles y scenarios primero"
-    text: "el árbol fuente público debe describir caminos reales de despliegue, no fragmentos desconectados"
-  - title: "Separar el runtime"
-    text: "el engine de ejecución y el árbol fuente deben poder evolucionar por separado"
-  - title: "Mantenerlo explícito"
-    text: "defaults, scripts auxiliares y metadata de paquete deben ser fáciles de revisar"
-environments_title: "Supported source coverage"
-environments_title_es: "Cobertura fuente soportada"
+  - title: "Curado por encima de ad hoc"
+    text: "publicá caminos de solución que se sientan listos para usar, no fragmentos desconectados"
+  - title: "Separá la orquestación"
+    text: "Infra ejecuta las soluciones, pero no posee el catálogo de soluciones"
+  - title: "Dejá visibles los contratos"
+    text: "defaults, scripts auxiliares y metadata de empaquetado deben seguir siendo revisables"
+environments_title: "How it fits"
+environments_title_es: "Dónde encaja"
 environments:
-  - Multipass on a local development machine
-  - Existing Ubuntu or Debian hosts reachable over SSH
-  - Basic AWS EC2 single-node setups
-  - Source trees later consumed by `k3s-ops`, `productive-k3s-infra`, and `pk3s`
+  - Start here when you want to choose a curated solution path
+  - Continue to Infra when you want that path executed on a platform
+  - Continue to CLI when you want the simplest and recommended operator interface
+  - Remember that this repository owns the solution definitions, not the deployment engine
 environments_es:
-  - Multipass en una máquina de desarrollo local
-  - Hosts Ubuntu o Debian existentes alcanzables por SSH
-  - Setups básicos de nodo único sobre AWS EC2
-  - Árboles fuente luego consumidos por `k3s-ops`, `productive-k3s-infra` y `pk3s`
+  - Empezá acá cuando quieras elegir un camino curado de solución
+  - Seguí por Infra cuando quieras que ese camino se ejecute sobre una plataforma
+  - Seguí por CLI cuando quieras la interfaz operativa más simple y recomendada
+  - Recordá que este repositorio posee las definiciones de solución, no el engine de despliegue
 not_title: "What it is not"
 not_title_es: "Qué no es"
 not_items:
-  - Not a replacement for Productive K3S Core
-  - Not the package execution engine
-  - Not a promise that every public scenario is production-ready as-is
+  - Not the deployment engine
+  - Not the base Kubernetes installation layer
+  - Not a claim that every public path is already the final form for every production need
 not_items_es:
-  - No reemplaza a Productive K3S Core
-  - No es el engine que ejecuta paquetes
-  - No promete que cada scenario público esté listo para producción tal como viene
-not_note: "It is the public content layer for Productive K3S infrastructure profiles."
-not_note_es: "Es la capa pública de contenido para los profiles de infraestructura de Productive K3S."
+  - No es el engine de despliegue
+  - No es la capa base de instalación Kubernetes
+  - No afirma que cada camino público ya sea la forma final para toda necesidad de producción
+not_note: "It is the curated solution layer for Productive K3S deployments."
+not_note_es: "Es la capa de soluciones curadas para los despliegues de Productive K3S."
 ---

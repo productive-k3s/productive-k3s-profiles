@@ -1,4 +1,4 @@
-# ARM Support
+# Soporte ARM
 
 Esta página documenta el camino público validado para ARM en Productive K3S Profiles y los pasos de preparación del host que fueron necesarios en la validación retenida sobre Raspberry Pi.
 

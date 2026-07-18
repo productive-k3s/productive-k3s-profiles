@@ -1,8 +1,8 @@
 # English Documentation
 
-This is the default documentation entry point for Productive K3S Profiles.
+This is the default documentation path for Productive K3S Profiles.
 
-Use this tree when you want the source-of-truth documentation for public profiles, scenarios, and their authoring model.
+Use this tree when you want to browse the curated deployment solutions of Productive K3S and understand how those public paths are maintained.
 
 ## Start here
 

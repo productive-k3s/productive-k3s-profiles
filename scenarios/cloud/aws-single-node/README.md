@@ -41,7 +41,7 @@ make scenario-down SCENARIO=aws-single-node
 
 ## Recommended Commands
 
-The root `Makefile` exposes a generic scenario entrypoint:
+The root `Makefile` exposes a generic scenario path:
 
 ```bash
 make scenario-up SCENARIO=aws-single-node

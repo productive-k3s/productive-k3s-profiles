@@ -39,7 +39,7 @@ Ese perfil alcanzó para pasar `preflight`, hacer bootstrap de `k3s`, `Longhorn`
 
 ## Guía de preparación
 
-Ver [ARM Support](arm-support.md) para los pasos previos:
+Ver [Soporte ARM](arm-support.md) para los pasos previos:
 
 - habilitar `openssh-server`
 - agregar tu clave pública SSH

@@ -1,5 +1,5 @@
 site_name: Productive K3S Profiles
-site_description: Public profile and scenario source documentation for Productive K3S, with bilingual documentation.
+site_description: Public curated deployment solution documentation for Productive K3S, with bilingual documentation.
 site_author: Productive K3S Profiles
 site_url: https://profiles.productive-k3s.io/
 repo_url: https://github.com/productive-k3s/productive-k3s-profiles
@@ -103,8 +103,8 @@ nav:
               - On-prem basic: es/user-docs/onprem-basic.md
               - On-prem basic ARM: es/user-docs/onprem-basic-arm.md
               - AWS single-node: es/user-docs/aws-single-node.md
-          - ARM Support: es/user-docs/arm-support.md
-          - Targets de Make: es/user-docs/make-targets.md
+          - Soporte ARM: es/user-docs/arm-support.md
+          - Objetivos de Make: es/user-docs/make-targets.md
           - Modos de Productive K3S Core: es/user-docs/productive-k3s-modes.md
       - Documentación para desarrolladores:
           - es/developer-docs/index.md
@@ -117,8 +117,8 @@ nav:
 
 extra:
   pk3s:
-    footer_slogan_en: "Public profile and scenario source documentation for Productive K3S, from local authoring to published profile artifacts."
-    footer_slogan_es: "Documentación pública de profiles y scenarios de Productive K3S, desde el authoring local hasta los artefactos de profile publicados."
+    footer_slogan_en: "Public curated deployment solution documentation for Productive K3S, from maintained scenarios to published profile artifacts."
+    footer_slogan_es: "Documentación pública de soluciones curadas de despliegue para Productive K3S, desde scenarios mantenidos hasta artefactos de profile publicados."
     contact_label_en: "Contact"
     contact_label_es: "Contacto"
     newsletter_label_en: "Newsletter"

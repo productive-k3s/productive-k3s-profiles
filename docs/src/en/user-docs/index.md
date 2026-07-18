@@ -1,6 +1,6 @@
 # User Docs
 
-This section groups the public scenarios, their main `make` entry points, and the source-oriented operator behavior owned by `productive-k3s-profiles`.
+This section groups the public scenarios, their main `make` paths, and the shared operator references owned by `productive-k3s-profiles`.
 
 ## Pages
 

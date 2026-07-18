@@ -1,6 +1,6 @@
 # Razones Del Diseño De `productive-k3s-profiles`
 
-`productive-k3s-profiles` existe porque el contenido fuente de profiles/scenarios y la ejecución de runtime resuelven problemas distintos.
+`productive-k3s-profiles` existe porque las soluciones curadas de despliegue y la ejecución de runtime resuelven problemas distintos.
 
 ## Por qué no alcanza con `productive-k3s-core`
 
@@ -22,26 +22,26 @@ No alcanza cuando además necesitás estandarizar:
 
 ## Por qué separar los profiles del engine de Infra
 
-Este repositorio está centrado intencionalmente en el contenido fuente público y no en el engine de runtime.
+Este repositorio está centrado intencionalmente en contenido curado de despliegue y no en la capa de ejecución.
 
 La separación existe para que:
 
 - cambiar un scenario público no fuerce un nuevo bundle de `productive-k3s-infra`
 - `productive-k3s-infra` pueda validar compatibilidad contra este repo sin ser dueño de su contenido
-- `productive-k3s-ops` pueda construir artefactos `profile.tgz` desde un repo fuente limpio
+- `productive-k3s-ops` pueda construir artefactos `profile.tgz` desde un repositorio público limpio
 
-## Por qué los scenarios siguen siendo la unidad práctica de authoring
+## Por qué los scenarios siguen siendo la unidad práctica de implementación
 
 Aunque los artefactos publicados están orientados a profiles, la implementación sigue estando guiada por scenarios.
 
-El objetivo de diseño es ofrecer caminos de despliegue que sean:
+El objetivo de diseño es ofrecer caminos de despliegue que se sientan:
 
 - reutilizables
 - evaluables
 - explícitos
 - cercanos a lo que un equipo realmente ejecutaría
 
-Por eso los entrypoints públicos son cosas como:
+Por eso los caminos públicos son cosas como:
 
 - clústeres locales con Multipass
 - bootstrap on-premises por SSH
@@ -71,11 +71,11 @@ Le permiten a este repositorio:
 2. ensamblar el clúster después
 3. instalar el stack compartido al final
 
-Sin esa separación, el authoring de scenarios públicos tendría que pelear contra un bootstrap más monolítico.
+Sin esa separación, la implementación de scenarios públicos tendría que pelear contra un bootstrap más monolítico.
 
 ## Racional general
 
-Tomado como conjunto, el repositorio busca ubicarse entre scripting crudo de infraestructura y una plataforma privada totalmente productizada.
+Tomado como conjunto, el repositorio busca ubicarse entre scripting crudo de infraestructura y una capa privada de producto completamente cerrada.
 
 Apunta a ofrecer:
 

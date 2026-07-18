@@ -1,6 +1,6 @@
 # Reasons Behind `productive-k3s-profiles`
 
-`productive-k3s-profiles` exists because profile/scenario source content and runtime execution solve different problems.
+`productive-k3s-profiles` exists because curated deployment solutions and runtime execution solve different problems.
 
 ## Why not stop at `productive-k3s-core`
 
@@ -22,26 +22,26 @@ It is not enough when you also need to standardize:
 
 ## Why split profiles from the Infra engine
 
-This repository is intentionally centered on public source content instead of the runtime engine.
+This repository is intentionally centered on curated deployment content instead of the execution layer.
 
 The split exists so that:
 
 - changing a public scenario does not force a new `productive-k3s-infra` bundle
 - `productive-k3s-infra` can validate compatibility against this repo without owning its contents
-- `productive-k3s-ops` can package `profile.tgz` artifacts from a clean source-of-truth repo
+- `productive-k3s-ops` can package `profile.tgz` artifacts from a clean public content repo
 
-## Why scenarios are still the practical authoring unit
+## Why scenarios are still the practical implementation unit
 
 Even though published artifacts are profile-oriented, the implementation is still scenario driven.
 
-The design goal is to provide deployment paths that are:
+The design goal is to provide deployment paths that feel:
 
 - reusable
 - evaluable
 - explicit
 - close to what a team would actually run
 
-That is why the public entry points are things like:
+That is why the public paths are things like:
 
 - local Multipass clusters
 - on-premises SSH bootstrap
@@ -71,11 +71,11 @@ They let this repository:
 2. assemble the cluster second
 3. install the shared stack last
 
-Without that split, public scenario authoring would have to fight a more monolithic bootstrap flow.
+Without that split, public scenario implementation would have to fight a more monolithic bootstrap flow.
 
 ## Overall rationale
 
-Taken together, the repository is meant to sit between raw infrastructure scripting and a fully productized private platform.
+Taken together, the repository is meant to sit between raw infrastructure scripting and a fully private product layer.
 
 It aims to provide:
 

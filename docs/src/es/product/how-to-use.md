@@ -1,6 +1,8 @@
 # Cómo Usar Productive K3S Profiles
 
-`productive-k3s-profiles` es el repositorio fuente público del contenido de profiles y scenarios. En el flujo normal para usuarios finales, los operadores consumen `profile.tgz` publicados a través de `pk3s` o `productive-k3s-infra`; no ejecutan este repo directamente.
+`productive-k3s-profiles` es donde elegís el camino curado de solución de despliegue que mejor encaja con tu plataforma.
+
+En el flujo normal orientado a usuarios, los operadores consumen esos caminos curados mediante `pk3s` o `productive-k3s-infra`; no suelen ejecutar este repo directamente como primer paso.
 
 ## Elegí el profile correcto
 
@@ -52,7 +54,7 @@ Qué no significa:
 
 ## Consumí profiles publicados
 
-El camino normal para usuarios es package-first:
+El camino normal para usuarios es elegir una solución curada y dejar que Infra o CLI la ejecuten:
 
 ```bash
 pk3s profile show multipass-1-server-2-agents
@@ -78,9 +80,9 @@ La mayoría de los scenarios públicos soportan dos modos fuente:
 
 Si se usa `remote`, `PRODUCTIVE_K3S_VERSION` puede fijar una versión específica. Si se omite, el scenario resuelve el último release desde `PRODUCTIVE_K3S_RELEASE_REPO`.
 
-## Usá los entrypoints de desarrollo
+## Usá los caminos de desarrollo
 
-Los profiles `.env` fuente siguen siendo válidos acá para authoring, CI y pruebas de compatibilidad contra el engine de Infra.
+Los profiles `.env` fuente siguen siendo válidos acá para desarrollo del repositorio, CI y pruebas de compatibilidad contra el engine de Infra.
 
 Ejemplos de desarrollo:
 
@@ -101,7 +103,7 @@ Patrones habituales de comandos por scenario:
 - inspección del estado generado: `status`
 - cleanup o teardown: `clean` o `down`
 
-Ver [Targets de Make](../user-docs/make-targets.md) para el detalle completo.
+Ver [Objetivos de Make](../user-docs/make-targets.md) para el detalle completo.
 
 ## Notas
 
