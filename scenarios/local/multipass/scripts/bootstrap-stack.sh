@@ -16,6 +16,11 @@ ensure_logs_dir
 load_cluster_metadata
 begin_infra_command_telemetry "${COMMAND_NAME}"
 export_resolved_telemetry_env
+export PRODUCTIVE_K3S_SSH_HOST="${SERVER_IP}"
+export PRODUCTIVE_K3S_SSH_USER="${SSH_USER:-ubuntu}"
+export PRODUCTIVE_K3S_SSH_PORT="${SSH_PORT:-22}"
+export PRODUCTIVE_K3S_SSH_KEY_PATH="${SSH_KEY_PATH:-}"
+export PRODUCTIVE_K3S_SSH_EXTRA_OPTS="${SSH_EXTRA_OPTS:-}"
 
 "${SCRIPT_DIR}/sync-hosts.sh"
 

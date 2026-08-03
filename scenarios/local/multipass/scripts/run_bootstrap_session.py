@@ -34,6 +34,7 @@ ENGINE_ENV_KEYS = [
 ]
 
 ANSI_ESCAPE_RE = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+COMPLETION_MARKERS = ["[INFO] DONE. Quick checks:"]
 
 
 def sanitize_prompt_buffer(value: str) -> str:
@@ -100,6 +101,55 @@ def build_prompt_map(args):
     raise ValueError(f"unsupported mode: {args.mode}")
 
 
+def prompt_group(prompt_text: str):
+    groups = {
+        "Existing k3s installation detected. Continue using it without changes? [required]": "k3s_server_install_state",
+        "k3s was not detected. Install it now? [required]": "k3s_server_install_state",
+        "Helm is already installed. Continue using it without changes? [required]": "helm_install_state",
+        "Helm was not detected. Install it now? [required]": "helm_install_state",
+        "Existing k3s agent installation detected. Continue using it without changes? [required]": "k3s_agent_install_state",
+        "k3s agent was not detected. Install it now? [required]": "k3s_agent_install_state",
+        "Longhorn is already present. Leave it unchanged and continue? [optional]": "longhorn_install_state",
+        "Longhorn is missing. Install it now? [optional]": "longhorn_install_state",
+        "Rancher is already present. Leave it unchanged and continue? [optional]": "rancher_install_state",
+        "Rancher is missing. Install it now? [optional]": "rancher_install_state",
+        "The in-cluster registry is already present. Leave it unchanged and continue? [optional]": "registry_install_state",
+        "The in-cluster registry is missing. Install it now? [optional]": "registry_install_state",
+    }
+    return groups.get(prompt_text)
+
+
+def ssh_command(remote_script: str):
+    ssh_host = os.environ.get("PRODUCTIVE_K3S_SSH_HOST", "").strip()
+    ssh_user = os.environ.get("PRODUCTIVE_K3S_SSH_USER", "").strip()
+    ssh_port = os.environ.get("PRODUCTIVE_K3S_SSH_PORT", "").strip() or "22"
+    ssh_key_path = os.environ.get("PRODUCTIVE_K3S_SSH_KEY_PATH", "").strip()
+    ssh_extra_opts = os.environ.get("PRODUCTIVE_K3S_SSH_EXTRA_OPTS", "").strip()
+
+    if not ssh_host or not ssh_user:
+        return None
+
+    command = [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "UserKnownHostsFile=/dev/null",
+        "-o",
+        "ConnectTimeout=10",
+        "-p",
+        ssh_port,
+    ]
+    if ssh_key_path:
+        command.extend(["-i", ssh_key_path])
+    if ssh_extra_opts:
+        command.extend(shlex.split(ssh_extra_opts))
+    command.extend([f"{ssh_user}@{ssh_host}", f"bash -lc {shlex.quote(remote_script)}"])
+    return command
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--instance", required=True)
@@ -128,15 +178,17 @@ def main():
         remote_script += f"{telemetry_prefix} "
     remote_script += f"./scripts/apply.sh --mode {shlex.quote(args.mode)}"
 
-    command = [
-        "multipass",
-        "exec",
-        args.instance,
-        "--",
-        "bash",
-        "-lc",
-        remote_script,
-    ]
+    command = ssh_command(remote_script)
+    if command is None:
+        command = [
+            "multipass",
+            "exec",
+            args.instance,
+            "--",
+            "bash",
+            "-lc",
+            remote_script,
+        ]
 
     proc = subprocess.Popen(
         command,
@@ -151,7 +203,13 @@ def main():
     log_handle = log_path.open("w", encoding="utf-8") if log_path else None
     buffer = ""
 
+    def debug_log(message: str):
+        if log_handle:
+            log_handle.write(f"\n[bootstrap-debug] {message}\n")
+            log_handle.flush()
+
     rc = 1
+    process_completed = False
     try:
         while True:
             ch = proc.stdout.read(1)
@@ -178,6 +236,7 @@ def main():
                         break
 
                 if matched_prompt is not None:
+                    debug_log(f"matched prompt: {matched_prompt}")
                     if proc.stdin is None:
                         raise RuntimeError("stdin unexpectedly unavailable")
                     proc.stdin.write(f"{matched_answer}\n")
@@ -188,9 +247,50 @@ def main():
                         else:
                             log_handle.write(f"[auto-response] {matched_answer}\n")
                         log_handle.flush()
+                    matched_group = prompt_group(matched_prompt)
                     pending.pop(matched_index)
+                    if matched_group is not None:
+                        pending = [
+                            entry for entry in pending
+                            if prompt_group(entry[0]) != matched_group
+                        ]
+                    debug_log(
+                        "pending after match: "
+                        + (", ".join(prompt_text for prompt_text, _ in pending) if pending else "<empty>")
+                    )
+                    if not pending:
+                        debug_log("closing stdin after consuming last pending prompt")
+                        proc.stdin.close()
                     buffer = ""
-        rc = proc.wait()
+                    normalized_buffer = ""
+            completion_marker_seen = any(marker in normalized_buffer for marker in COMPLETION_MARKERS)
+            if completion_marker_seen:
+                debug_log(
+                    "completion marker seen; pending="
+                    + (", ".join(prompt_text for prompt_text, _ in pending) if pending else "<empty>")
+                )
+                if pending and proc.stdin is not None and not proc.stdin.closed:
+                    debug_log("closing stdin after completion marker despite remaining pending prompts")
+                    proc.stdin.close()
+            if completion_marker_seen:
+                try:
+                    rc = proc.wait(timeout=5)
+                    debug_log(f"process exited cleanly after completion marker with rc={rc}")
+                except subprocess.TimeoutExpired:
+                    debug_log("process still running after completion marker; terminating it")
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        debug_log("process did not terminate after completion marker; killing it")
+                        proc.kill()
+                        proc.wait()
+                    rc = 0
+                process_completed = True
+                break
+        if not process_completed:
+            rc = proc.wait()
+            debug_log(f"process exited without completion marker path with rc={rc}")
     finally:
         if log_handle:
             log_handle.close()
