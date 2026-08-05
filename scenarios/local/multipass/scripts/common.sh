@@ -12,9 +12,12 @@ if [[ -r "${REPO_ROOT}/scripts/release-config.sh" ]]; then
   source "${REPO_ROOT}/scripts/release-config.sh"
 else
   : "${PRODUCTIVE_K3S_SOURCE_DEFAULT:=remote}"
-  : "${PRODUCTIVE_K3S_CORE_VERSION_DEFAULT:=0.9.4}"
+  : "${PRODUCTIVE_K3S_CORE_VERSION_DEFAULT:=0.9.5}"
   : "${PRODUCTIVE_K3S_RELEASE_REPO_DEFAULT:=productive-k3s/productive-k3s-core}"
 fi
+: "${PRODUCTIVE_K3S_STACK_ARTIFACT_DEFAULT:=base-0.1.0.tgz}"
+: "${PRODUCTIVE_K3S_STACK_RELEASE_BASE_URL_DEFAULT:=https://downloads.productive-k3s.io/addons}"
+: "${PRODUCTIVE_K3S_STACK_REMOTE_PATH_DEFAULT:=/tmp/productive-k3s-base-stack.tgz}"
 resolve_default_productive_k3s_repo() {
   local candidate="${SCENARIO_DIR}/../../../../productive-k3s-core"
   if [[ -d "${candidate}" ]]; then
@@ -37,6 +40,8 @@ if [[ -z "${PRODUCTIVE_K3S_VERSION}" && "${PRODUCTIVE_K3S_SOURCE}" == "remote" ]
   PRODUCTIVE_K3S_VERSION="${PRODUCTIVE_K3S_CORE_VERSION_DEFAULT}"
 fi
 PRODUCTIVE_K3S_RELEASE_REPO="${PRODUCTIVE_K3S_RELEASE_REPO:-${PRODUCTIVE_K3S_RELEASE_REPO_DEFAULT}}"
+PRODUCTIVE_K3S_STACK_TGZ_URL="${PRODUCTIVE_K3S_STACK_TGZ_URL:-${PRODUCTIVE_K3S_STACK_RELEASE_BASE_URL_DEFAULT}/${PRODUCTIVE_K3S_STACK_ARTIFACT_DEFAULT}}"
+PRODUCTIVE_K3S_STACK_REMOTE_PATH="${PRODUCTIVE_K3S_STACK_REMOTE_PATH:-${PRODUCTIVE_K3S_STACK_REMOTE_PATH_DEFAULT}}"
 PRODUCTIVE_K3S_DISTRO="${PRODUCTIVE_K3S_DISTRO:-k3s}"
 TELEMETRY_ENABLED="${TELEMETRY_ENABLED:-}"
 TELEMETRY_ENDPOINT="${TELEMETRY_ENDPOINT:-}"
@@ -336,6 +341,8 @@ load_cluster_metadata() {
   PRODUCTIVE_K3S_SOURCE_RESOLVED="$(jq -r '.productive_k3s.source' "${CLUSTER_JSON}")"
   PRODUCTIVE_K3S_VERSION_RESOLVED="$(jq -r '.productive_k3s.version' "${CLUSTER_JSON}")"
   PRODUCTIVE_K3S_RELEASE_REPO_RESOLVED="$(jq -r '.productive_k3s.release_repo' "${CLUSTER_JSON}")"
+  PRODUCTIVE_K3S_STACK_TGZ_URL_RESOLVED="$(jq -r '.productive_k3s.stack_tgz_url // empty' "${CLUSTER_JSON}")"
+  PRODUCTIVE_K3S_STACK_REMOTE_PATH_RESOLVED="$(jq -r '.productive_k3s.stack_remote_path // empty' "${CLUSTER_JSON}")"
   TELEMETRY_ENABLED_RESOLVED="$(jq -r '.telemetry.enabled // false' "${CLUSTER_JSON}")"
   TELEMETRY_ENDPOINT_RESOLVED="$(jq -r '.telemetry.endpoint // empty' "${CLUSTER_JSON}")"
   TELEMETRY_MAX_RETRIES_RESOLVED="$(jq -r '.telemetry.max_retries // 3' "${CLUSTER_JSON}")"
@@ -368,6 +375,8 @@ export_resolved_cluster_config_env() {
   export PRODUCTIVE_K3S_SOURCE="${PRODUCTIVE_K3S_SOURCE_RESOLVED}"
   export PRODUCTIVE_K3S_VERSION="${PRODUCTIVE_K3S_VERSION_RESOLVED}"
   export PRODUCTIVE_K3S_RELEASE_REPO="${PRODUCTIVE_K3S_RELEASE_REPO_RESOLVED}"
+  export PRODUCTIVE_K3S_STACK_TGZ_URL="${PRODUCTIVE_K3S_STACK_TGZ_URL_RESOLVED}"
+  export PRODUCTIVE_K3S_STACK_REMOTE_PATH="${PRODUCTIVE_K3S_STACK_REMOTE_PATH_RESOLVED}"
   export_resolved_telemetry_env
 }
 
