@@ -3,6 +3,7 @@ set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 COMMAND_NAME="stack-up"
+STACK_REGISTRY_CONVERGENCE_ATTEMPTS="${STACK_REGISTRY_CONVERGENCE_ATTEMPTS:-2}"
 
 cleanup_telemetry() {
   local exit_code=$?
@@ -32,19 +33,62 @@ if [[ "${PRODUCTIVE_K3S_SOURCE_RESOLVED}" == "remote" ]]; then
   stack_tgz_arg=(--stack-tgz "${PRODUCTIVE_K3S_STACK_REMOTE_PATH_RESOLVED}")
 fi
 
-python3 "${SCRIPT_DIR}/run_bootstrap_session.py" \
-  --instance "${SERVER_NAME}" \
-  --mode stack \
-  --remote-dir "${REMOTE_DIR}" \
-  "${stack_tgz_arg[@]}" \
-  --base-domain "${BASE_DOMAIN}" \
-  --rancher-host "${RANCHER_HOST}" \
-  --registry-host "${REGISTRY_HOST}" \
-  --rancher-password "admin" \
-  --registry-size "20Gi" \
-  --longhorn-data-path "/data" \
-  --longhorn-replica-count 2 \
-  --log-file "${LOG_DIR}/bootstrap-stack.log"
+run_stack_bootstrap_session() {
+  python3 "${SCRIPT_DIR}/run_bootstrap_session.py" \
+    --instance "${SERVER_NAME}" \
+    --mode stack \
+    --remote-dir "${REMOTE_DIR}" \
+    "${stack_tgz_arg[@]}" \
+    --base-domain "${BASE_DOMAIN}" \
+    --rancher-host "${RANCHER_HOST}" \
+    --registry-host "${REGISTRY_HOST}" \
+    --rancher-password "admin" \
+    --registry-size "20Gi" \
+    --longhorn-data-path "/data" \
+    --longhorn-replica-count 2 \
+    --log-file "${LOG_DIR}/bootstrap-stack.log"
+}
+
+wait_for_rancher_registry_prereqs() {
+  local kubectl_cmd
+  kubectl_cmd="$(productive_k3s_remote_kubectl_cmd)"
+
+  log "Waiting for Rancher rollout before registry verification"
+  ssh_exec_with_timeout "${SERVER_IP}" 960 "${kubectl_cmd} rollout status deploy/rancher -n cattle-system --timeout=15m"
+  ssh_exec_with_timeout "${SERVER_IP}" 660 "${kubectl_cmd} rollout status deploy/rancher-webhook -n cattle-system --timeout=10m"
+}
+
+registry_deployment_ready() {
+  local kubectl_cmd
+  kubectl_cmd="$(productive_k3s_remote_kubectl_cmd)"
+
+  ssh_exec_with_timeout "${SERVER_IP}" 30 "${kubectl_cmd} get deploy/registry -n registry >/dev/null 2>&1" || return 1
+  ssh_exec_with_timeout "${SERVER_IP}" 660 "${kubectl_cmd} rollout status deploy/registry -n registry --timeout=10m"
+}
+
+ensure_registry_stack_convergence() {
+  local attempt=1
+
+  while (( attempt <= STACK_REGISTRY_CONVERGENCE_ATTEMPTS )); do
+    wait_for_rancher_registry_prereqs
+    if registry_deployment_ready; then
+      log "Registry deployment is ready after stack bootstrap"
+      return 0
+    fi
+
+    if (( attempt == STACK_REGISTRY_CONVERGENCE_ATTEMPTS )); then
+      err "registry deployment is still unavailable after ${STACK_REGISTRY_CONVERGENCE_ATTEMPTS} stack bootstrap attempt(s)"
+      return 1
+    fi
+
+    warn "registry deployment missing after stack bootstrap attempt ${attempt}; retrying stack convergence"
+    run_stack_bootstrap_session
+    attempt=$((attempt + 1))
+  done
+}
+
+run_stack_bootstrap_session
+ensure_registry_stack_convergence
 
 "${SCRIPT_DIR}/reconcile-cluster-defaults.sh"
 
