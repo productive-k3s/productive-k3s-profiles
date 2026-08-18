@@ -55,7 +55,11 @@ wait_for_rancher_registry_prereqs() {
 
   log "Waiting for Rancher rollout before registry verification"
   ssh_exec_with_timeout "${SERVER_IP}" 960 "${kubectl_cmd} rollout status deploy/rancher -n cattle-system --timeout=15m"
-  ssh_exec_with_timeout "${SERVER_IP}" 660 "${kubectl_cmd} rollout status deploy/rancher-webhook -n cattle-system --timeout=10m"
+  if ssh_exec_with_timeout "${SERVER_IP}" 30 "${kubectl_cmd} get deploy/rancher-webhook -n cattle-system >/dev/null 2>&1"; then
+    ssh_exec_with_timeout "${SERVER_IP}" 660 "${kubectl_cmd} rollout status deploy/rancher-webhook -n cattle-system --timeout=10m"
+  else
+    log "Rancher webhook deployment is not present; continuing without waiting for it"
+  fi
 }
 
 registry_deployment_ready() {
