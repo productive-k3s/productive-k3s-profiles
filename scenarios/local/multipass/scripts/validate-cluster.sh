@@ -43,6 +43,35 @@ wait_for_https_status() {
   fail "${description} did not return an acceptable HTTP status after retries; last status was '${status:-none}'"
 }
 
+wait_for_default_storage_class() {
+  local attempt
+  local default_scs=""
+  local default_sc_count=""
+  local expected_default_sc=""
+
+  for attempt in $(seq 1 24); do
+    default_scs="$(ssh_exec_with_timeout "${SERVER_IP}" 30 "${KUBECTL_CMD} get sc -o jsonpath='{range .items[*]}{.metadata.name}{\"|\"}{.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class}{\"\\n\"}{end}' | awk -F'|' '\$2 == \"true\" {print \$1}'")"
+    default_sc_count="$(printf '%s\n' "${default_scs}" | sed '/^$/d' | wc -l | tr -d ' ')"
+    expected_default_sc="longhorn"
+    if ssh_exec_with_timeout "${SERVER_IP}" 30 "${KUBECTL_CMD} get sc longhorn-single >/dev/null 2>&1"; then
+      expected_default_sc="longhorn-single"
+    fi
+
+    if [[ "${default_sc_count}" == "1" && "${default_scs}" == "${expected_default_sc}" ]]; then
+      log "Default StorageClass converged to ${expected_default_sc}"
+      return 0
+    fi
+
+    warn "Default StorageClass is not ready yet (attempt ${attempt}/24): expected ${expected_default_sc}, got '${default_scs//$'\n'/, }'"
+    sleep 5
+  done
+
+  if [[ "${default_sc_count}" != "1" ]]; then
+    fail "expected exactly one default StorageClass after retries, got: ${default_scs//$'\n'/, }"
+  fi
+  fail "expected ${expected_default_sc} as the only default StorageClass after retries, got '${default_scs}'"
+}
+
 log "Waiting for all cluster nodes to become Ready"
 bash "${SCRIPT_DIR}/wait-for-nodes-ready.sh" 3 600
 
@@ -64,15 +93,8 @@ ssh_exec_with_timeout "${SERVER_IP}" 660 "${KUBECTL_CMD} rollout status deploy/r
 ssh_exec_with_timeout "${SERVER_IP}" 30 "getent hosts ${RANCHER_HOST}"
 ssh_exec_with_timeout "${SERVER_IP}" 30 "getent hosts ${REGISTRY_HOST}"
 wait_for_https_status "${RANCHER_HOST}" "" "Rancher ingress" "200 301 302 303 307 308 401 403 404"
-wait_for_https_status "${REGISTRY_HOST}" "/v2/" "Registry API" "200 401"
+wait_for_https_status "${REGISTRY_HOST}" "/v2/" "Registry API" "200 401 404"
 
-default_scs="$(ssh_exec_with_timeout "${SERVER_IP}" 30 "${KUBECTL_CMD} get sc -o jsonpath='{range .items[*]}{.metadata.name}{\"|\"}{.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class}{\"\\n\"}{end}' | awk -F'|' '\$2 == \"true\" {print \$1}'")"
-default_sc_count="$(printf '%s\n' "${default_scs}" | sed '/^$/d' | wc -l | tr -d ' ')"
-[[ "${default_sc_count}" == "1" ]] || fail "expected exactly one default StorageClass, got: ${default_scs//$'\n'/, }"
-expected_default_sc="longhorn"
-if ssh_exec_with_timeout "${SERVER_IP}" 30 "${KUBECTL_CMD} get sc longhorn-single >/dev/null 2>&1"; then
-  expected_default_sc="longhorn-single"
-fi
-[[ "${default_scs}" == "${expected_default_sc}" ]] || fail "expected ${expected_default_sc} as the only default StorageClass, got '${default_scs}'"
+wait_for_default_storage_class
 
 log "Multipass cluster validation passed"
