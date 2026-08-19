@@ -45,6 +45,7 @@ stack-up:
 	$(SCRIPTS_DIR)/bootstrap-stack.sh
 
 validate:
+	$(SCRIPTS_DIR)/refresh-generated-artifacts.sh
 	$(SCRIPTS_DIR)/validate-cluster.sh
 
 up: cluster-up validate
