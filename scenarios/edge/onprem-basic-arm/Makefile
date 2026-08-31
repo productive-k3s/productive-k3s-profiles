@@ -6,10 +6,12 @@ SCENARIO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 export SCENARIO_DIR
 export CASE_PREFIX := ONPREM
 GENERATED_DIR := $(SCENARIO_DIR)/generated
-SCRIPTS_DIR := $(SCENARIO_DIR)/../../../ansible/roles/remote_cluster/files
 LOCAL_SCRIPTS_DIR := $(SCENARIO_DIR)/scripts
+SCRIPTS_DIR := $(LOCAL_SCRIPTS_DIR)
 TESTS_DIR := $(SCENARIO_DIR)/../../../tests
 DEV_SCRIPTS_DIR := $(SCENARIO_DIR)/../../../scripts
+PRODUCTIVE_K3S_INFRA_REPO_DIR ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../../productive-k3s-infra)"; if [ -d "$$candidate/tests" ] && [ -d "$$candidate/scripts" ]; then printf '%s' "$$candidate"; fi)
+REMOTE_TESTS_DIR := $(if $(wildcard $(TESTS_DIR)/test-remote-telemetry-consent.sh),$(TESTS_DIR),$(PRODUCTIVE_K3S_INFRA_REPO_DIR)/tests)
 ONPREM_ENV_FILE ?= $(SCENARIO_DIR)/onprem.env
 
 -include $(ONPREM_ENV_FILE)
@@ -129,8 +131,10 @@ scenario-test-static:
 		fi; \
 	fi
 	$(MAKE) -n up >/dev/null
-	bash $(TESTS_DIR)/test-remote-telemetry-consent.sh
-	bash $(TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh
+	@test -f "$(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh" || { echo "missing infra shared test: $(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh" >&2; exit 1; }
+	@test -f "$(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh" || { echo "missing infra shared test: $(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh" >&2; exit 1; }
+	bash $(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh
+	bash $(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh
 
 scenario-test-contract:
 	$(TESTS_DIR)/contract-check.sh onprem-basic-arm

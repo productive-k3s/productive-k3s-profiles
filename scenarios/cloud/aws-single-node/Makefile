@@ -5,11 +5,13 @@
 SCENARIO_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 export SCENARIO_DIR
 export CASE_PREFIX := AWS
+PRODUCTIVE_K3S_INFRA_REPO_DIR ?= $(shell candidate="$(abspath $(SCENARIO_DIR)/../../../productive-k3s-infra)"; if [ -d "$$candidate/tests" ] && [ -d "$$candidate/scripts" ]; then printf '%s' "$$candidate"; fi)
 GENERATED_DIR := $(SCENARIO_DIR)/generated
 SCRIPTS_DIR := $(SCENARIO_DIR)/scripts
-SHARED_SCRIPTS_DIR := $(SCENARIO_DIR)/../../../ansible/roles/remote_cluster/files
+SHARED_SCRIPTS_DIR := $(if $(wildcard $(SCENARIO_DIR)/../../../ansible/roles/remote_cluster/files/common.sh),$(SCENARIO_DIR)/../../../ansible/roles/remote_cluster/files,$(PRODUCTIVE_K3S_INFRA_REPO_DIR)/ansible/roles/remote_cluster/files)
 TESTS_DIR := $(SCENARIO_DIR)/../../../tests
 DEV_SCRIPTS_DIR := $(SCENARIO_DIR)/../../../scripts
+REMOTE_TESTS_DIR := $(if $(wildcard $(TESTS_DIR)/test-remote-telemetry-consent.sh),$(TESTS_DIR),$(PRODUCTIVE_K3S_INFRA_REPO_DIR)/tests)
 export REMOTE_CLUSTER_REFRESH_SCRIPT := $(SCRIPTS_DIR)/refresh-generated-artifacts.sh
 OPENTOFU_DIR := $(SCENARIO_DIR)/opentofu
 AWS_ENV_FILE ?= $(SCENARIO_DIR)/aws.env
@@ -120,8 +122,10 @@ scenario-test-static: tofu-init
 	$(TOFU_BIN) -chdir=$(OPENTOFU_DIR) init -backend=false
 	$(TOFU_BIN) -chdir=$(OPENTOFU_DIR) validate
 	$(MAKE) -n up TOFU_BIN=$(TOFU_BIN) >/dev/null
-	bash $(TESTS_DIR)/test-remote-telemetry-consent.sh
-	bash $(TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh
+	@test -f "$(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh" || { echo "missing infra shared test: $(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh" >&2; exit 1; }
+	@test -f "$(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh" || { echo "missing infra shared test: $(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh" >&2; exit 1; }
+	bash $(REMOTE_TESTS_DIR)/test-remote-telemetry-consent.sh
+	bash $(REMOTE_TESTS_DIR)/test-remote-cluster-up-preserves-telemetry.sh
 
 scenario-test-contract:
 	$(TESTS_DIR)/contract-check.sh aws-single-node
