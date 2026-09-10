@@ -29,6 +29,18 @@ productive-k3s-profiles/
 - `docs/`: sitio público de documentación de profiles y scenarios
 - `scripts/`: helpers locales del repositorio, como wrappers de documentación
 
+Los defaults de profile y la metadata de paquete deben mantenerse consistentes.
+Todo input requerido declarado como `source: package-default` en un sidecar
+`*.package.yaml` debe tener un valor no vacío en el `.env` correspondiente,
+porque ese `.env` se convierte en el contrato de defaults del paquete. Los
+valores específicos de una instalación deben marcarse como `source:
+local-override` y ser provistos por el operador mediante `--env-file`.
+
+Durante la generación de release, los profiles empaquetados también declaran el
+path del scenario dentro del paquete y los targets de ejecución en
+`profile.yaml`. Infra consume esa metadata en vez de hardcodear nombres de
+scenarios de este repositorio.
+
 ## Artefactos generados
 
 Cada scenario puede escribir metadata generada bajo su propio directorio `generated/`, normalmente incluyendo cosas como:
