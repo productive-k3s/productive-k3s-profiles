@@ -8,6 +8,9 @@ Current public paths are organized by category:
 
 - `local/multipass`: creates local VMs and bootstraps a three-node cluster
 - `cloud/aws-single-node`: provisions a basic single-node `EC2` path with `OpenTofu` and bootstraps it over `SSH`
+- `cloud/gcp-single-node`: provisions a basic single-node Google Compute Engine path with `OpenTofu` and bootstraps it over `SSH`
+- `cloud/hetzner-single-node`: provisions a basic single-node Hetzner Cloud path with `OpenTofu` and bootstraps it over `SSH`
+- `cloud/oci-arm-single-node`: provisions a basic single-node OCI Ampere ARM64 path with `OpenTofu` and bootstraps it over `SSH`
 - `edge/onprem-basic`: bootstrap existing machines by declaring a `server` IP and optional `agent` IPs over SSH
 - `edge/onprem-basic-arm`: same remote bootstrap path, but documented as a public ARM-oriented path for Raspberry Pi and similar Ubuntu `24.04` `arm64` hosts
 

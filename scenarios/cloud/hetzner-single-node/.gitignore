@@ -1,0 +1,5 @@
+hetzner.env
+generated/
+opentofu/.terraform/
+opentofu/terraform.tfstate
+opentofu/terraform.tfstate.backup

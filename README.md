@@ -8,6 +8,9 @@ Recommended public paths today include:
 
 - `onprem-basic` for existing hosts reachable through `SSH`
 - `aws-single-node-basic` for a simple cloud evaluation path
+- `gcp-basic` for a simple Google Cloud single-node path
+- `hetzner-basic` for a low-cost Hetzner Cloud single-node path
+- `oci-arm` for an Oracle Cloud Ampere ARM64 single-node path
 - `multipass-1-server-2-agents` for a local multi-node path
 
 Behind that product view, this repository contains the public `profiles/`, `scenarios/`, package metadata, and helper assets used to generate published `profile.tgz` artifacts.
@@ -47,7 +50,7 @@ PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/productive-k3s/productive-k3s-
 Behavior:
 
 - `test-matrix` runs `static + contract`
-- `test-live-matrix` runs live validation across every discovered scenario
+- `test-live-matrix` runs live validation across every discovered scenario; provider cloud scenarios skip unless credentials are available
 - detailed targets like `test-static`, `test-contract`, and `test-live` live under `tests/`
 - if `PRODUCTIVE_K3S_INFRA_REPO_URL` and/or `PRODUCTIVE_K3S_INFRA_REPO_REF` are set, the runner clones that repo/ref
 - otherwise, if `INFRA_VERSION` is set, the runner clones that exact ref

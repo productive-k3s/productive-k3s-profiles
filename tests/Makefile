@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 DEV_WRAPPER := ../scripts/productive-k3s-profiles-dev.sh
 
-.PHONY: test-static test-contract test-live test-matrix test-live-matrix test-matrix-raw test-live-matrix-raw test-checkstatus test-checkstatus-matrix test-checkstatus-live test-clean-artifacts test-clean
+.PHONY: test-static test-contract test-live test-matrix test-live-matrix test-matrix-raw test-live-matrix-raw test-checkstatus test-checkstatus-matrix test-checkstatus-live test-clean-artifacts test-clean cloud-contract-check
 
 test-static:
 	PROFILE="$(PROFILE)" SCENARIO="$(SCENARIO)" INFRA_VERSION="$(INFRA_VERSION)" PRODUCTIVE_K3S_INFRA_REPO_DIR="$(PRODUCTIVE_K3S_INFRA_REPO_DIR)" PRODUCTIVE_K3S_INFRA_REPO_URL="$(PRODUCTIVE_K3S_INFRA_REPO_URL)" PRODUCTIVE_K3S_INFRA_REPO_REF="$(PRODUCTIVE_K3S_INFRA_REPO_REF)" bash $(DEV_WRAPPER) test-static
@@ -24,6 +24,9 @@ test-matrix-raw:
 
 test-live-matrix-raw:
 	bash ./common.sh test-live-matrix
+
+cloud-contract-check:
+	bash ./cloud-contract-check.sh "$(SCENARIO)"
 
 test-checkstatus:
 	bash $(DEV_WRAPPER) test-checkstatus
