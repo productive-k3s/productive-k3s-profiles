@@ -73,10 +73,11 @@ wait_for_default_storage_class() {
 }
 
 log "Waiting for all cluster nodes to become Ready"
-bash "${SCRIPT_DIR}/wait-for-nodes-ready.sh" 3 600
+expected_node_count="$((1 + ${#AGENT_NAMES[@]}))"
+bash "${SCRIPT_DIR}/wait-for-nodes-ready.sh" "${expected_node_count}" 600
 
 node_count="$(ssh_exec_with_timeout "${SERVER_IP}" 30 "${KUBECTL_CMD} get nodes --no-headers | wc -l")"
-[[ "${node_count}" == "3" ]] || fail "expected 3 nodes, got ${node_count}"
+[[ "${node_count}" == "${expected_node_count}" ]] || fail "expected ${expected_node_count} nodes, got ${node_count}"
 
 for ns in cert-manager longhorn-system cattle-system registry; do
   log "Checking namespace ${ns}"

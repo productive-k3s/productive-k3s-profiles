@@ -1,11 +1,10 @@
 locals {
   server_name   = "${var.cluster_name}-server"
-  agent1_name   = "${var.cluster_name}-agent-1"
-  agent2_name   = "${var.cluster_name}-agent-2"
+  agent_names   = [for index in range(var.agent_count) : "${var.cluster_name}-agent-${index + 1}"]
   rancher_host  = "rancher.${var.base_domain}"
   registry_host = "registry.${var.base_domain}"
 
-  nodes = {
+  server_nodes = {
     (local.server_name) = {
       name       = local.server_name
       image      = var.image
@@ -14,23 +13,20 @@ locals {
       disk       = var.server_disk
       cloud_init = "${path.module}/cloud-init/server.yaml"
     }
-    (local.agent1_name) = {
-      name       = local.agent1_name
+  }
+
+  agent_nodes = {
+    for index, agent_name in local.agent_names : agent_name => {
+      name       = agent_name
       image      = var.image
       cpus       = tostring(var.agent_cpus)
       memory     = var.agent_memory
       disk       = var.agent_disk
-      cloud_init = "${path.module}/cloud-init/agent-1.yaml"
-    }
-    (local.agent2_name) = {
-      name       = local.agent2_name
-      image      = var.image
-      cpus       = tostring(var.agent_cpus)
-      memory     = var.agent_memory
-      disk       = var.agent_disk
-      cloud_init = "${path.module}/cloud-init/agent-2.yaml"
+      cloud_init = "${path.module}/cloud-init/agent-${index + 1}.yaml"
     }
   }
+
+  nodes = merge(local.server_nodes, local.agent_nodes)
 }
 
 resource "null_resource" "multipass_instance" {
@@ -63,13 +59,12 @@ resource "null_resource" "generated_artifacts" {
     base_domain   = var.base_domain
     remote_dir    = var.remote_dir
     server_name   = local.server_name
-    agent1_name   = local.agent1_name
-    agent2_name   = local.agent2_name
+    agent_names   = join(",", local.agent_names)
     rancher_host  = local.rancher_host
     registry_host = local.registry_host
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/../scripts/refresh-generated-artifacts.sh --cluster-name '${self.triggers.cluster_name}' --base-domain '${self.triggers.base_domain}' --remote-dir '${self.triggers.remote_dir}' --server-name '${self.triggers.server_name}' --agent-name '${self.triggers.agent1_name}' --agent-name '${self.triggers.agent2_name}' --rancher-host '${self.triggers.rancher_host}' --registry-host '${self.triggers.registry_host}'"
+    command = "${path.module}/../scripts/refresh-generated-artifacts.sh --cluster-name '${self.triggers.cluster_name}' --base-domain '${self.triggers.base_domain}' --remote-dir '${self.triggers.remote_dir}' --server-name '${self.triggers.server_name}' --agent-names '${self.triggers.agent_names}' --rancher-host '${self.triggers.rancher_host}' --registry-host '${self.triggers.registry_host}'"
   }
 }

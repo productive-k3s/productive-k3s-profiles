@@ -33,6 +33,11 @@ if [[ "${PRODUCTIVE_K3S_SOURCE_RESOLVED}" == "remote" ]]; then
   stack_tgz_arg=(--stack-tgz "${PRODUCTIVE_K3S_STACK_REMOTE_PATH_RESOLVED}")
 fi
 
+longhorn_replica_count=2
+if [[ "${#ALL_NODE_NAMES[@]}" -lt 2 ]]; then
+  longhorn_replica_count=1
+fi
+
 run_stack_bootstrap_session() {
   python3 "${SCRIPT_DIR}/run_bootstrap_session.py" \
     --instance "${SERVER_NAME}" \
@@ -45,7 +50,7 @@ run_stack_bootstrap_session() {
     --rancher-password "admin" \
     --registry-size "20Gi" \
     --longhorn-data-path "/data" \
-    --longhorn-replica-count 2 \
+    --longhorn-replica-count "${longhorn_replica_count}" \
     --log-file "${LOG_DIR}/bootstrap-stack.log"
 }
 

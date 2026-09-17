@@ -26,6 +26,7 @@ TELEMETRY_ENV_KEYS = [
 ENGINE_ENV_KEYS = [
     "PRODUCTIVE_K3S_ENGINE",
     "PRODUCTIVE_K3S_AUTO_APPROVE_PREFLIGHT_WARNINGS",
+    "PRODUCTIVE_K3S_AUTO_APPROVE_APPLY_PLAN",
     "PRODUCTIVE_K3S_SSH_HOST",
     "PRODUCTIVE_K3S_SSH_USER",
     "PRODUCTIVE_K3S_SSH_PORT",
@@ -92,6 +93,7 @@ def build_prompt_map(args):
             ("Choose TLS mode (1/2)", "2"),
             ("Longhorn data mount path", args.longhorn_data_path),
             ("Longhorn default replica count (1 for single-node)", str(args.longhorn_replica_count)),
+            ("Longhorn storage minimal available percentage (10 is recommended for single-node dev/lab)", "10"),
             ("ClusterIssuer 'selfsigned' is missing. Create it now?", "y"),
             ("Longhorn preflight found warnings. Continue anyway?", "y"),
             ("Install the missing packages for Longhorn?", "y"),
