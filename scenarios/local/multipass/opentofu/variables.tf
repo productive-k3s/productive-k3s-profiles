@@ -42,6 +42,16 @@ variable "agent_cpus" {
   default = 2
 }
 
+variable "agent_count" {
+  type    = number
+  default = 2
+
+  validation {
+    condition     = contains([0, 1, 2], var.agent_count)
+    error_message = "agent_count must be 0, 1, or 2."
+  }
+}
+
 variable "agent_memory" {
   type    = string
   default = "4G"

@@ -22,6 +22,7 @@ export TELEMETRY_REQUEST_TIMEOUT_SECONDS ?= 10
 export TELEMETRY_OUTBOX_DIR ?=
 export TELEMETRY_USER_AGENT ?= productive-k3s-infra/multipass
 export TOFU_BIN
+export TF_VAR_agent_count ?= 2
 
 infra-init:
 	@test -n "$(TOFU_BIN)" || { echo "tofu or terraform is required"; exit 1; }

@@ -94,8 +94,11 @@ discover_scenarios() {
 resolve_scenario_from_profile() {
   local requested="$1"
   case "${requested}" in
-    multipass-1-server-2-agents) printf 'multipass\n' ;;
+    multipass-1-server-2-agents|multipass-single-node) printf 'multipass\n' ;;
     aws-single-node-basic) printf 'aws-single-node\n' ;;
+    gcp-basic) printf 'gcp-single-node\n' ;;
+    hetzner-basic) printf 'hetzner-single-node\n' ;;
+    oci-arm) printf 'oci-arm-single-node\n' ;;
     on-prem-basic|onprem-basic) printf 'onprem-basic\n' ;;
     on-prem-arm|onprem-basic-arm) printf 'onprem-basic-arm\n' ;;
     *) return 1 ;;

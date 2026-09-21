@@ -1,0 +1,66 @@
+inputs:
+  - name: HCLOUD_TOKEN
+    required: true
+    sensitive: true
+    source: local-override
+    description: Hetzner Cloud API token used by the OpenTofu provider
+  - name: HETZNER_LOCATION
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hetzner Cloud location for the single-node VM
+  - name: HETZNER_CLUSTER_NAME
+    required: true
+    sensitive: false
+    source: package-default
+    description: Name used for generated resources and Productive K3S metadata
+  - name: HETZNER_SERVER_TYPE
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hetzner Cloud server type for the single node
+  - name: HETZNER_IMAGE
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hetzner Cloud image used for the server
+  - name: HETZNER_SSH_PUBLIC_KEY_PATH
+    required: true
+    sensitive: false
+    source: local-override
+    description: Absolute local path to the SSH public key uploaded to Hetzner Cloud
+  - name: HETZNER_SSH_PRIVATE_KEY_PATH
+    required: true
+    sensitive: false
+    source: local-override
+    description: Absolute local path to the matching private key
+  - name: HETZNER_SSH_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach SSH on TCP/22
+  - name: HETZNER_HTTP_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach HTTP and HTTPS on TCP/80 and TCP/443
+  - name: HETZNER_API_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach the Kubernetes API on TCP/6443
+  - name: HETZNER_BASE_DOMAIN
+    required: true
+    sensitive: false
+    source: package-default
+    description: Base domain used to derive service hostnames when explicit hosts are not set
+  - name: HETZNER_RANCHER_HOST
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hostname used for Rancher access
+  - name: HETZNER_REGISTRY_HOST
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hostname used for the in-cluster registry

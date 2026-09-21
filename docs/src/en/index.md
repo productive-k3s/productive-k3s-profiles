@@ -15,6 +15,7 @@ Use this tree when you want to browse the curated deployment solutions of Produc
 - [How to use Productive K3S Profiles](product/how-to-use.md)
 - [Relationship with Productive K3S Infra and Core](product/productive-k3s-relationship.md)
 - [Multipass scenario](user-docs/multipass.md)
+- Cloud scenarios: `aws-single-node`, `gcp-single-node`, `hetzner-single-node`, and `oci-arm-single-node`
 - [Make targets](user-docs/make-targets.md)
 - [Testing and matrix](developer-docs/guides/testing-and-matrix.md)
 - [Documentation workflow](developer-docs/guides/documentation-workflow.md)

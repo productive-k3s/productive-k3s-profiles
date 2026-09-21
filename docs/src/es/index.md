@@ -15,6 +15,7 @@ Usá este árbol cuando quieras recorrer las soluciones curadas de despliegue de
 - [Cómo usar Productive K3S Profiles](product/how-to-use.md)
 - [Relación con Productive K3S Infra y Core](product/productive-k3s-relationship.md)
 - [Escenario Multipass](user-docs/multipass.md)
+- Escenarios cloud: `aws-single-node`, `gcp-single-node`, `hetzner-single-node` y `oci-arm-single-node`
 - [Objetivos de Make](user-docs/make-targets.md)
 - [Tests y matriz](developer-docs/guides/testing-and-matrix.md)
 - [Flujo de documentación](developer-docs/guides/documentation-workflow.md)

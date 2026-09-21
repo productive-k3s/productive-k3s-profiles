@@ -15,7 +15,7 @@ output "server_name" {
 }
 
 output "agent_names" {
-  value = [local.agent1_name, local.agent2_name]
+  value = local.agent_names
 }
 
 output "rancher_host" {

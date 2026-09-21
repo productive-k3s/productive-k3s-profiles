@@ -24,6 +24,10 @@ while (($# > 0)); do
     --server-name) server_name="$2"; shift 2 ;;
     --rancher-host) rancher_host="$2"; shift 2 ;;
     --registry-host) registry_host="$2"; shift 2 ;;
+    --agent-names)
+      IFS=',' read -r -a agent_names <<< "$2"
+      shift 2
+      ;;
     --agent-name) agent_names+=("$2"); shift 2 ;;
     *)
       err "unknown argument: $1"

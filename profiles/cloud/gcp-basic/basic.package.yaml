@@ -1,0 +1,71 @@
+inputs:
+  - name: GCP_PROJECT_ID
+    required: true
+    sensitive: false
+    source: local-override
+    description: Google Cloud project id used for provisioning
+  - name: GCP_REGION
+    required: true
+    sensitive: false
+    source: package-default
+    description: Google Cloud region used for the single-node VM
+  - name: GCP_ZONE
+    required: true
+    sensitive: false
+    source: package-default
+    description: Google Cloud zone used for the single-node VM
+  - name: GCP_CLUSTER_NAME
+    required: true
+    sensitive: false
+    source: package-default
+    description: Name used for generated resources and Productive K3S metadata
+  - name: GCP_MACHINE_TYPE
+    required: true
+    sensitive: false
+    source: package-default
+    description: Compute Engine machine type for the single node
+  - name: GCP_BOOT_DISK_SIZE_GB
+    required: true
+    sensitive: false
+    source: package-default
+    description: Boot disk size in GiB
+  - name: GCP_SSH_PUBLIC_KEY_PATH
+    required: true
+    sensitive: false
+    source: local-override
+    description: Absolute local path to the SSH public key added to the VM
+  - name: GCP_SSH_PRIVATE_KEY_PATH
+    required: true
+    sensitive: false
+    source: local-override
+    description: Absolute local path to the matching private key
+  - name: GCP_SSH_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach SSH on TCP/22
+  - name: GCP_HTTP_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach HTTP and HTTPS on TCP/80 and TCP/443
+  - name: GCP_API_ALLOWED_CIDR
+    required: true
+    sensitive: false
+    source: package-default
+    description: CIDR allowed to reach the Kubernetes API on TCP/6443
+  - name: GCP_BASE_DOMAIN
+    required: true
+    sensitive: false
+    source: package-default
+    description: Base domain used to derive service hostnames when explicit hosts are not set
+  - name: GCP_RANCHER_HOST
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hostname used for Rancher access
+  - name: GCP_REGISTRY_HOST
+    required: true
+    sensitive: false
+    source: package-default
+    description: Hostname used for the in-cluster registry
