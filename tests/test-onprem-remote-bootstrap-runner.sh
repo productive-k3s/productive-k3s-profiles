@@ -25,7 +25,13 @@ for script_path in script_paths:
     spec.loader.exec_module(module)
 
     class Args:
+        host = "127.0.0.1"
+        user = "ubuntu"
+        port = "22"
+        key_path = ""
+        extra_opts = ""
         mode = "stack"
+        remote_dir = "/home/ubuntu/productive-k3s"
         base_domain = "k3s.lab.internal"
         rancher_host = "rancher.k3s.lab.internal"
         registry_host = "registry.k3s.lab.internal"
@@ -64,6 +70,15 @@ for script_path in script_paths:
     assert "Longhorn preflight found warnings. Continue anyway?" not in stack_tgz_prompt_names, f"{script_path} must omit the auto-approved Longhorn preflight prompt in stack artifact mode"
     assert "Install the missing packages for Longhorn?" in stack_tgz_prompt_names, f"{script_path} must still answer Longhorn package prompts in stack artifact mode"
     assert "Enable and start 'iscsid' now?" in stack_tgz_prompt_names, f"{script_path} must still answer iscsid prompts in stack artifact mode"
+    assert module.select_prompt_map(Args()) == [], f"{script_path} must not use prompt-detection pending prompts in stack artifact mode"
+    ssh_command = module.build_ssh_command(Args())
+    remote_script = module.build_remote_script(Args())
+    assert "-tt" not in ssh_command, f"{script_path} must not allocate a pseudo-TTY in stack artifact mode"
+    assert "bootstrap_answers_file=\"$(mktemp)\"" in remote_script, f"{script_path} must create a deterministic answers file in stack artifact mode"
+    assert "PRODUCTIVE_K3S_AUTO_APPROVE_PREFLIGHT_WARNINGS=true" in remote_script, f"{script_path} must preserve Core preflight auto-approval"
+    assert "./productive-k3s-core.sh stack install --tgz /tmp/productive-k3s-base-stack.tgz < \"${bootstrap_answers_file}\"" in remote_script, f"{script_path} must feed Core from the answers file in stack artifact mode"
+    Args.stack_tgz = ""
+    assert "-tt" in module.build_ssh_command(Args()), f"{script_path} must keep pseudo-TTY allocation for regular interactive stack mode"
 
 for bootstrap_stack_path in bootstrap_stack_paths:
     bootstrap_stack = bootstrap_stack_path.read_text(encoding="utf-8")
