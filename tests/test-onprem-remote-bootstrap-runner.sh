@@ -33,6 +33,7 @@ for script_path in script_paths:
         registry_size = "20Gi"
         longhorn_data_path = "/data"
         longhorn_replica_count = 1
+        stack_tgz = ""
 
     prompts = module.build_prompt_map(Args())
     prompt_map = dict(prompts)
@@ -56,6 +57,13 @@ for script_path in script_paths:
             "stack",
             prompt,
         ), f"{script_path} must wait for explicit runtime prompt output before answering: {prompt}"
+
+    assert "Longhorn preflight found warnings. Continue anyway?" in prompt_names, f"{script_path} should keep the Longhorn preflight prompt in regular stack mode"
+    Args.stack_tgz = "/tmp/productive-k3s-base-stack.tgz"
+    stack_tgz_prompt_names = [prompt for prompt, _ in module.build_prompt_map(Args())]
+    assert "Longhorn preflight found warnings. Continue anyway?" not in stack_tgz_prompt_names, f"{script_path} must omit the auto-approved Longhorn preflight prompt in stack artifact mode"
+    assert "Install the missing packages for Longhorn?" in stack_tgz_prompt_names, f"{script_path} must still answer Longhorn package prompts in stack artifact mode"
+    assert "Enable and start 'iscsid' now?" in stack_tgz_prompt_names, f"{script_path} must still answer iscsid prompts in stack artifact mode"
 
 for bootstrap_stack_path in bootstrap_stack_paths:
     bootstrap_stack = bootstrap_stack_path.read_text(encoding="utf-8")
