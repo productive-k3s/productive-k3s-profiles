@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 DEV_WRAPPER := ../scripts/productive-k3s-profiles-dev.sh
 
-.PHONY: test-static test-contract test-live test-matrix test-live-matrix test-matrix-raw test-live-matrix-raw test-checkstatus test-checkstatus-matrix test-checkstatus-live test-clean-artifacts test-clean cloud-contract-check
+.PHONY: test-static test-contract test-live test-matrix test-live-matrix test-matrix-raw test-live-matrix-raw test-checkstatus test-checkstatus-matrix test-checkstatus-live test-clean-artifacts test-clean cloud-contract-check onprem-remote-bootstrap-runner-check
 
 test-static:
 	PROFILE="$(PROFILE)" SCENARIO="$(SCENARIO)" INFRA_VERSION="$(INFRA_VERSION)" PRODUCTIVE_K3S_INFRA_REPO_DIR="$(PRODUCTIVE_K3S_INFRA_REPO_DIR)" PRODUCTIVE_K3S_INFRA_REPO_URL="$(PRODUCTIVE_K3S_INFRA_REPO_URL)" PRODUCTIVE_K3S_INFRA_REPO_REF="$(PRODUCTIVE_K3S_INFRA_REPO_REF)" bash $(DEV_WRAPPER) test-static
@@ -16,10 +16,14 @@ test-live:
 test-matrix:
 	INFRA_VERSION="$(INFRA_VERSION)" PRODUCTIVE_K3S_INFRA_REPO_DIR="$(PRODUCTIVE_K3S_INFRA_REPO_DIR)" PRODUCTIVE_K3S_INFRA_REPO_URL="$(PRODUCTIVE_K3S_INFRA_REPO_URL)" PRODUCTIVE_K3S_INFRA_REPO_REF="$(PRODUCTIVE_K3S_INFRA_REPO_REF)" bash $(DEV_WRAPPER) test-matrix
 
+onprem-remote-bootstrap-runner-check:
+	bash ./test-onprem-remote-bootstrap-runner.sh
+
 test-live-matrix:
 	INFRA_VERSION="$(INFRA_VERSION)" PRODUCTIVE_K3S_INFRA_REPO_DIR="$(PRODUCTIVE_K3S_INFRA_REPO_DIR)" PRODUCTIVE_K3S_INFRA_REPO_URL="$(PRODUCTIVE_K3S_INFRA_REPO_URL)" PRODUCTIVE_K3S_INFRA_REPO_REF="$(PRODUCTIVE_K3S_INFRA_REPO_REF)" bash $(DEV_WRAPPER) test-live-matrix
 
 test-matrix-raw:
+	$(MAKE) onprem-remote-bootstrap-runner-check
 	bash ./common.sh test-matrix
 
 test-live-matrix-raw:
