@@ -13,6 +13,10 @@ script_paths = [
     root / "scenarios/edge/onprem-basic/scripts/run_remote_bootstrap_session.py",
     root / "scenarios/edge/onprem-basic-arm/scripts/run_remote_bootstrap_session.py",
 ]
+bootstrap_stack_paths = [
+    root / "scenarios/edge/onprem-basic/scripts/bootstrap-stack.sh",
+    root / "scenarios/edge/onprem-basic-arm/scripts/bootstrap-stack.sh",
+]
 
 for script_path in script_paths:
     spec = importlib.util.spec_from_file_location("runner", script_path)
@@ -52,6 +56,13 @@ for script_path in script_paths:
             "stack",
             prompt,
         ), f"{script_path} must wait for explicit runtime prompt output before answering: {prompt}"
+
+for bootstrap_stack_path in bootstrap_stack_paths:
+    bootstrap_stack = bootstrap_stack_path.read_text(encoding="utf-8")
+    assert "Downloading published stack artifact on controller" in bootstrap_stack, f"{bootstrap_stack_path} must download the published stack artifact in remote mode"
+    assert "PRODUCTIVE_K3S_STACK_TGZ_URL_RESOLVED" in bootstrap_stack, f"{bootstrap_stack_path} must use the resolved stack artifact URL"
+    assert "PRODUCTIVE_K3S_STACK_REMOTE_PATH_RESOLVED" in bootstrap_stack, f"{bootstrap_stack_path} must use the resolved remote stack artifact path"
+    assert "stack_tgz_arg=(--stack-tgz" in bootstrap_stack, f"{bootstrap_stack_path} must pass the uploaded stack artifact to the remote runner"
 
 print("[PASS] onprem remote bootstrap runners cover Longhorn ordered prompts")
 PY
