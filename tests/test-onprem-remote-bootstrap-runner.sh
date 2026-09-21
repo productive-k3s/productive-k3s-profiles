@@ -43,5 +43,15 @@ for script_path in script_paths:
     default_sc_index = prompt_names.index("Make Longhorn the default StorageClass?")
     assert replica_index < minimal_index < default_sc_index, f"{script_path} must keep the Longhorn ordered prompt chain contiguous"
 
+    for prompt in [
+        "Longhorn preflight found warnings. Continue anyway?",
+        "Install the missing packages for Longhorn?",
+        "Enable and start 'iscsid' now?",
+    ]:
+        assert not module.mode_allows_proactive_prompt_answer(
+            "stack",
+            prompt,
+        ), f"{script_path} must wait for explicit runtime prompt output before answering: {prompt}"
+
 print("[PASS] onprem remote bootstrap runners cover Longhorn ordered prompts")
 PY
