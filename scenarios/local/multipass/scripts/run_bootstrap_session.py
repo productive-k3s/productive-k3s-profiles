@@ -75,32 +75,44 @@ def build_prompt_map(args):
             ("Proceed with this plan?", "y"),
         ]
     if args.mode == "stack":
-        return common + [
-            ("Longhorn is already present. Leave it unchanged and continue? [optional]", "y"),
-            ("Longhorn is missing. Install it now? [optional]", "y"),
-            ("Rancher is already present. Leave it unchanged and continue? [optional]", "y"),
-            ("Rancher is missing. Install it now? [optional]", "y"),
-            ("The in-cluster registry is already present. Leave it unchanged and continue? [optional]", "y"),
-            ("The in-cluster registry is missing. Install it now? [optional]", "y"),
-            ("cert-manager is missing. Install it now? [required for TLS-dependent installs]", "y"),
-            ("Base domain (used to build hostnames)", args.base_domain),
-            ("Rancher hostname (DNS name)", args.rancher_host),
-            ("Rancher bootstrap password", args.rancher_password),
-            ("Registry hostname (DNS name)", args.registry_host),
-            ("Registry PVC size", args.registry_size),
-            ("Registry StorageClass (blank uses cluster default)", ""),
-            ("Do you want to enable basic auth on the in-cluster registry?", "n"),
-            ("Choose TLS mode (1/2)", "2"),
-            ("Longhorn data mount path", args.longhorn_data_path),
-            ("Longhorn default replica count (1 for single-node)", str(args.longhorn_replica_count)),
-            ("Longhorn storage minimal available percentage (10 is recommended for single-node dev/lab)", "10"),
-            ("ClusterIssuer 'selfsigned' is missing. Create it now?", "y"),
-            ("Longhorn preflight found warnings. Continue anyway?", "y"),
-            ("Install the missing packages for Longhorn?", "y"),
-            ("Enable and start 'iscsid' now?", "y"),
-            ("Make Longhorn the default StorageClass?", "y"),
-        ]
+        raise ValueError("stack mode requires --stack-tgz")
     raise ValueError(f"unsupported mode: {args.mode}")
+
+
+def uses_stack_artifact_stdin(args) -> bool:
+    return args.mode == "stack" and bool(getattr(args, "stack_tgz", None))
+
+
+def select_prompt_map(args):
+    if uses_stack_artifact_stdin(args):
+        return []
+    return build_prompt_map(args)
+
+
+def build_stack_artifact_answers() -> str:
+    # Keep this sequence aligned with the generic Core stack artifact flow.
+    return "\n".join(["y", "y", "y", "y", "y"]) + "\n"
+
+
+def build_remote_script(args) -> str:
+    remote_script = f"cd {shlex.quote(args.remote_dir)} && "
+    telemetry_prefix = telemetry_env_prefix()
+    if telemetry_prefix:
+        remote_script += f"{telemetry_prefix} "
+    if uses_stack_artifact_stdin(args):
+        answers = shlex.quote(build_stack_artifact_answers())
+        remote_script += (
+            'bootstrap_answers_file="$(mktemp)" && '
+            f"printf '%s' {answers} > \"${{bootstrap_answers_file}}\" && "
+            "unset PRODUCTIVE_K3S_ADDONS_REPO_DIR && "
+            "export PRODUCTIVE_K3S_AUTO_APPROVE_PREFLIGHT_WARNINGS=true && "
+            f"./productive-k3s-core.sh stack install --tgz {shlex.quote(args.stack_tgz)} "
+            '< "${bootstrap_answers_file}"; '
+            'stack_rc=$?; rm -f "${bootstrap_answers_file}"; exit "${stack_rc}"'
+        )
+    else:
+        remote_script += f"./scripts/apply.sh --mode {shlex.quote(args.mode)}"
+    return remote_script
 
 
 def prompt_group(prompt_text: str):
@@ -111,12 +123,6 @@ def prompt_group(prompt_text: str):
         "Helm was not detected. Install it now? [required]": "helm_install_state",
         "Existing k3s agent installation detected. Continue using it without changes? [required]": "k3s_agent_install_state",
         "k3s agent was not detected. Install it now? [required]": "k3s_agent_install_state",
-        "Longhorn is already present. Leave it unchanged and continue? [optional]": "longhorn_install_state",
-        "Longhorn is missing. Install it now? [optional]": "longhorn_install_state",
-        "Rancher is already present. Leave it unchanged and continue? [optional]": "rancher_install_state",
-        "Rancher is missing. Install it now? [optional]": "rancher_install_state",
-        "The in-cluster registry is already present. Leave it unchanged and continue? [optional]": "registry_install_state",
-        "The in-cluster registry is missing. Install it now? [optional]": "registry_install_state",
     }
     return groups.get(prompt_text)
 
@@ -160,32 +166,18 @@ def main():
     parser.add_argument("--server-url")
     parser.add_argument("--cluster-token")
     parser.add_argument("--base-domain", default="k3s.lab.internal")
-    parser.add_argument("--rancher-host", default="rancher.k3s.lab.internal")
-    parser.add_argument("--registry-host", default="registry.k3s.lab.internal")
-    parser.add_argument("--rancher-password", default="admin")
-    parser.add_argument("--registry-size", default="20Gi")
-    parser.add_argument("--longhorn-data-path", default="/data")
-    parser.add_argument("--longhorn-replica-count", type=int, default=2)
     parser.add_argument("--stack-tgz")
     parser.add_argument("--log-file")
     args = parser.parse_args()
 
     if args.mode == "agent" and (not args.server_url or not args.cluster_token):
         parser.error("--server-url and --cluster-token are required for agent mode")
+    if args.mode == "stack" and not args.stack_tgz:
+        parser.error("--stack-tgz is required for stack mode")
 
-    prompt_map = build_prompt_map(args)
+    prompt_map = select_prompt_map(args)
     pending = list(prompt_map)
-    remote_script = f"cd {shlex.quote(args.remote_dir)} && "
-    telemetry_prefix = telemetry_env_prefix()
-    if telemetry_prefix:
-        remote_script += f"{telemetry_prefix} "
-    if args.mode == "stack" and args.stack_tgz:
-        remote_script += (
-            "unset PRODUCTIVE_K3S_ADDONS_REPO_DIR && "
-            f"./productive-k3s-core.sh stack install --tgz {shlex.quote(args.stack_tgz)}"
-        )
-    else:
-        remote_script += f"./scripts/apply.sh --mode {shlex.quote(args.mode)}"
+    remote_script = build_remote_script(args)
 
     command = ssh_command(remote_script)
     if command is None:
