@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 python3 - <<'PY' "${ROOT_DIR}"
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -38,6 +39,47 @@ for script_path, runner_source in zip(script_paths, runner_sources):
     assert module.mode_allows_proactive_prompt_answer("agent", agent_prompt, {"k3s": "missing"}), (
         f"{script_path} must allow the matching prompt after state detection"
     )
+
+    redactor = module.SensitiveOutputRedactor(["secret-token"])
+    redacted_output = redactor.feed("before secret-token after")
+    assert redacted_output == "before [REDACTED] after", (
+        f"{script_path} must redact secrets from retained output"
+    )
+
+    class AgentArgs:
+        host = "127.0.0.1"
+        user = "ubuntu"
+        port = "22"
+        key_path = ""
+        extra_opts = ""
+        mode = "agent"
+        remote_dir = "/home/ubuntu/productive-k3s"
+        server_url = "https://10.0.0.10:6443"
+        cluster_token = "secret-token"
+        base_domain = "k3s.lab.internal"
+        stack_tgz = None
+
+    assert "stty -echo" in module.build_remote_script(AgentArgs()), (
+        f"{script_path} must disable TTY echo before sending interactive secrets"
+    )
+
+    previous_idle_timeout = os.environ.get("PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_IDLE_TIMEOUT_SECONDS")
+    previous_total_timeout = os.environ.get("PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_TOTAL_TIMEOUT_SECONDS")
+    try:
+        os.environ["PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_IDLE_TIMEOUT_SECONDS"] = "30"
+        os.environ["PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_TOTAL_TIMEOUT_SECONDS"] = "120"
+        assert module.session_timeout_reason("agent", 0, 80, 100) is None
+        assert module.session_timeout_reason("agent", 0, 60, 100) == "no remote output for 30s"
+        assert module.session_timeout_reason("agent", 0, 100, 120) == "total runtime exceeded 120s"
+    finally:
+        if previous_idle_timeout is None:
+            os.environ.pop("PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_IDLE_TIMEOUT_SECONDS", None)
+        else:
+            os.environ["PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_IDLE_TIMEOUT_SECONDS"] = previous_idle_timeout
+        if previous_total_timeout is None:
+            os.environ.pop("PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_TOTAL_TIMEOUT_SECONDS", None)
+        else:
+            os.environ["PRODUCTIVE_K3S_REMOTE_BOOTSTRAP_TOTAL_TIMEOUT_SECONDS"] = previous_total_timeout
 
     class Args:
         host = "127.0.0.1"
