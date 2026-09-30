@@ -71,6 +71,8 @@ Si trabajás directo con el engine de runtime, la interfaz equivalente es `produ
 
 El `profile.env` embebido en un `profile.tgz` público se trata como defaults del paquete. Los valores específicos de instalación siguen perteneciendo a la máquina que invoca mediante `--env-file`, especialmente para targets cloud y on-prem.
 
+Los paquetes publicados normalizan `PRODUCTIVE_K3S_SOURCE=remote` para que el camino normal de usuario resuelva un bundle publicado de Core sin necesitar un checkout fuente hermano. Un override explícito de runtime todavía puede seleccionar `local` para desarrollo.
+
 ## Elegí el modo fuente de Productive K3S Core
 
 La mayoría de los scenarios públicos soportan dos modos fuente:

@@ -74,6 +74,8 @@ If you are working directly with the runtime engine, the equivalent interface is
 
 The `profile.env` embedded in a public `profile.tgz` is treated as package defaults. Installation-specific values still belong on the invoking machine through `--env-file`, especially for cloud and on-prem targets.
 
+Published packages normalize `PRODUCTIVE_K3S_SOURCE=remote` so the normal user path resolves a released Core bundle without requiring a sibling source checkout. An explicit runtime override can still select `local` for development.
+
 ## Choose the Productive K3S Core source mode
 
 Most public scenarios support two source modes:
