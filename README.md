@@ -80,6 +80,12 @@ productive-k3s-profiles/
 - Published `profile.tgz` artifacts are self-contained and are generated elsewhere.
 - Private/commercial profile source content belongs in `productive-k3s-profiles-pro`.
 
+## Software Materials
+
+Every publishable Profile resolves the `materials.lock.yaml` owned by its
+scenario. Packaging rewrites the BOM identity to the concrete Profile package,
+embeds `bom.json` in the TGZ, and emits a matching sidecar for Catalogs.
+
 ## License
 
 Apache License 2.0. See [LICENSE](./LICENSE).

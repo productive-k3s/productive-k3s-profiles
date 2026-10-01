@@ -276,11 +276,7 @@ detect_tofu_bin() {
     printf 'tofu'
     return
   fi
-  if command -v terraform >/dev/null 2>&1; then
-    printf 'terraform'
-    return
-  fi
-  err "tofu or terraform is required"
+  err "tofu is required"
   exit 1
 }
 
