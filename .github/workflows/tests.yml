@@ -19,3 +19,6 @@ jobs:
 
       - name: Run static + contract matrix
         run: make test-matrix INFRA_VERSION=development
+
+      - name: Enforce publishable contract coverage
+        run: make test-coverage

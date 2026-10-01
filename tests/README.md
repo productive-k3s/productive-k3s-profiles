@@ -12,6 +12,7 @@ Use the root paths for the main flows:
 
 ```bash
 PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/productive-k3s/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-matrix
+make test-coverage
 PRODUCTIVE_K3S_INFRA_REPO_URL="https://github.com/productive-k3s/productive-k3s-infra.git" PRODUCTIVE_K3S_INFRA_REPO_REF="development" make test-live-matrix
 ```
 
@@ -34,6 +35,10 @@ make -C tests test-live SCENARIO=onprem-basic INFRA_VERSION=0.9.62-0.9.4
 ```
 
 `test-matrix` runs only `static + contract`.
+
+`test-coverage` verifies that every profile resolves to a packaged scenario
+with a pinned `MaterialsLock`. The current baseline is `100%` (`8/8`) and the
+enforced floor is `80%`.
 
 `test-live` and `test-live-matrix` are intended for manual validation before push, not for default CI.
 

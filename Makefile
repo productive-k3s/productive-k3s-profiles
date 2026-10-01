@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: docs-build docs-serve docs-up docs-down docs-clean test-matrix test-live-matrix test-logs-clean
+.PHONY: docs-build docs-serve docs-up docs-down docs-clean test-coverage test-matrix test-live-matrix test-logs-clean
 
 docs-build:
 	$(MAKE) -C ./docs docs-build
@@ -19,6 +19,9 @@ docs-clean:
 
 test-matrix:
 	$(MAKE) -C ./tests test-matrix
+
+test-coverage:
+	$(MAKE) -C ./tests test-coverage
 
 test-live-matrix:
 	$(MAKE) -C ./tests test-live-matrix
