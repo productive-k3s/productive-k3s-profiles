@@ -65,6 +65,15 @@ Behavior:
 
 The goal of this split is to keep curated solutions evolving independently from the Infra release cadence.
 
+## Runtime compatibility contract
+
+Every profile package sidecar declares the `profile/v1` Infra contract, an
+Infra engine version window, and the bound Core version window. Packaging emits
+that contract into `profile.yaml`, keeps the product version from `VERSION`, and
+records the immutable source commit separately as `metadata.sourceRevision`.
+Infra validates both halves of its composite release before plan, apply,
+install, status, or destroy.
+
 ## Repository structure
 
 ```text
