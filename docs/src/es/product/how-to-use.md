@@ -73,6 +73,13 @@ El `profile.env` embebido en un `profile.tgz` público se trata como defaults de
 
 Los paquetes publicados normalizan `PRODUCTIVE_K3S_SOURCE=remote` para que el camino normal de usuario resuelva un bundle publicado de Core sin necesitar un checkout fuente hermano. Un override explícito de runtime todavía puede seleccionar `local` para desarrollo.
 
+Cada Profile publicado también declara su alcance de ejecución, las
+capacidades de runtime requeridas y los comandos necesarios. `pk3s profile
+list` y `pk3s profile show` usan esa metadata para informar si el entorno
+actual puede ejecutar el Profile antes de iniciar una instalación. Por
+ejemplo, los Profiles de Multipass requieren virtualización local, mientras
+que los Profiles on-prem requieren herramientas de SSH remoto.
+
 ## Elegí el modo fuente de Productive K3S Core
 
 La mayoría de los scenarios públicos soportan dos modos fuente:

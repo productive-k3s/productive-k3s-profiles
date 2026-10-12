@@ -1,3 +1,30 @@
+compatibility:
+  requires:
+    infra:
+      contract: profile/v1
+      minEngineVersion: 0.9.65
+      maxEngineVersionExclusive: 0.10.0
+    core:
+      minVersion: 0.9.6
+      maxVersionExclusive: 0.10.0
+  testedWith:
+    infra:
+      - release: 0.9.65-0.9.6
+        core: 0.9.6
+runtime:
+  executionScope: local-host
+  requiredCapabilities:
+    - local-virtualization
+  requiredCommands:
+    - curl
+    - jq
+    - multipass
+    - sha256sum
+    - ssh
+    - ssh-keygen
+    - tar
+    - timeout
+    - tofu
 inputs:
   - name: TF_VAR_cluster_name
     required: true

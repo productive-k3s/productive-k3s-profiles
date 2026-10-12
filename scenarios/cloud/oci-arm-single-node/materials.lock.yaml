@@ -1,0 +1,8 @@
+apiVersion: materials.productive-k3s.io/v1alpha1
+kind: MaterialsLock
+metadata: {owner: productive-k3s-profiles, package: oci-arm-single-node}
+spec:
+  materials:
+    - {id: opentofu, type: binary, name: opentofu, version: 1.12.6, source: "https://github.com/opentofu/opentofu", pinPolicy: exact, required: true}
+    - {id: oci-provider, type: opentofu-provider, name: oracle/oci, version: 9.0.0, source: "registry.opentofu.org/oracle/oci", pinPolicy: exact-lock, required: true}
+    - {id: ubuntu-image, type: os-image, name: ubuntu, version: "24.04", source: oci, pinPolicy: dynamic-resolved, required: true}

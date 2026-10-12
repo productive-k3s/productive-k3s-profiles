@@ -15,7 +15,7 @@ REMOTE_TESTS_DIR := $(if $(wildcard $(TESTS_DIR)/test-remote-telemetry-consent.s
 export REMOTE_CLUSTER_REFRESH_SCRIPT := $(SCRIPTS_DIR)/refresh-generated-artifacts.sh
 OPENTOFU_DIR := $(SCENARIO_DIR)/opentofu
 GCP_ENV_FILE ?= $(SCENARIO_DIR)/gcp.env
-TOFU_BIN ?= $(shell if command -v tofu >/dev/null 2>&1; then echo tofu; elif command -v terraform >/dev/null 2>&1; then echo terraform; fi)
+TOFU_BIN ?= $(shell command -v tofu >/dev/null 2>&1 && echo tofu)
 
 -include $(GCP_ENV_FILE)
 

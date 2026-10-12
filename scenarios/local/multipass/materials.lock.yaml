@@ -1,0 +1,8 @@
+apiVersion: materials.productive-k3s.io/v1alpha1
+kind: MaterialsLock
+metadata: {owner: productive-k3s-profiles, package: multipass}
+spec:
+  materials:
+    - {id: opentofu, type: binary, name: opentofu, version: 1.12.6, source: "https://github.com/opentofu/opentofu", pinPolicy: exact, required: true}
+    - {id: null-provider, type: opentofu-provider, name: hashicorp/null, version: 3.2.4, source: "registry.opentofu.org/hashicorp/null", pinPolicy: exact-lock, required: true}
+    - {id: ubuntu-image, type: os-image, name: ubuntu, version: "24.04", source: multipass, pinPolicy: release-series, required: true}

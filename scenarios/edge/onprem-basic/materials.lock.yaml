@@ -1,0 +1,7 @@
+apiVersion: materials.productive-k3s.io/v1alpha1
+kind: MaterialsLock
+metadata: {owner: productive-k3s-profiles, package: onprem-basic}
+spec:
+  materials:
+    - {id: productive-k3s-core, type: product-artifact, name: productive-k3s-core, version: 0.9.5, source: "https://github.com/productive-k3s/productive-k3s-core", pinPolicy: exact, required: true}
+    - {id: ansible-core, type: binary, name: ansible-core, version: "2.15", source: "https://github.com/ansible/ansible", pinPolicy: minimum-supported, required: false}

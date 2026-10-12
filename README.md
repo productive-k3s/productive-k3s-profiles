@@ -65,6 +65,21 @@ Behavior:
 
 The goal of this split is to keep curated solutions evolving independently from the Infra release cadence.
 
+## Runtime compatibility contract
+
+Every profile package sidecar declares the `profile/v1` Infra contract, an
+Infra engine version window, and the bound Core version window. Packaging emits
+that contract into `profile.yaml`, keeps the product version from `VERSION`, and
+records the immutable source commit separately as `metadata.sourceRevision`.
+Infra validates both halves of its composite release before plan, apply,
+install, status, or destroy.
+
+Each sidecar also declares a generic runtime contract: its execution scope,
+required capabilities, and required commands. CLI uses that metadata to mark a
+Profile unavailable before installation when the current environment cannot
+execute it. Profiles own these requirements; CLI evaluates them without
+hardcoding Profile names, and Infra remains the package execution engine.
+
 ## Repository structure
 
 ```text
@@ -79,6 +94,12 @@ productive-k3s-profiles/
 - Generated runtime state does not belong in this repository.
 - Published `profile.tgz` artifacts are self-contained and are generated elsewhere.
 - Private/commercial profile source content belongs in `productive-k3s-profiles-pro`.
+
+## Software Materials
+
+Every publishable Profile resolves the `materials.lock.yaml` owned by its
+scenario. Packaging rewrites the BOM identity to the concrete Profile package,
+embeds `bom.json` in the TGZ, and emits a matching sidecar for Catalogs.
 
 ## License
 
