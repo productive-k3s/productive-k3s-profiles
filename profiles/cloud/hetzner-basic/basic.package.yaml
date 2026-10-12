@@ -11,6 +11,13 @@ compatibility:
     infra:
       - release: 0.9.65-0.9.6
         core: 0.9.6
+runtime:
+  executionScope: cloud-api
+  requiredCapabilities:
+    - cloud-api
+  requiredCommands:
+    - jq
+    - tofu
 inputs:
   - name: HCLOUD_TOKEN
     required: true

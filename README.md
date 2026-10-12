@@ -74,6 +74,12 @@ records the immutable source commit separately as `metadata.sourceRevision`.
 Infra validates both halves of its composite release before plan, apply,
 install, status, or destroy.
 
+Each sidecar also declares a generic runtime contract: its execution scope,
+required capabilities, and required commands. CLI uses that metadata to mark a
+Profile unavailable before installation when the current environment cannot
+execute it. Profiles own these requirements; CLI evaluates them without
+hardcoding Profile names, and Infra remains the package execution engine.
+
 ## Repository structure
 
 ```text

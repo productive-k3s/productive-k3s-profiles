@@ -11,6 +11,19 @@ compatibility:
     infra:
       - release: 0.9.65-0.9.6
         core: 0.9.6
+runtime:
+  executionScope: remote-host
+  requiredCapabilities:
+    - remote-ssh
+  requiredCommands:
+    - ansible-playbook
+    - curl
+    - jq
+    - python3
+    - scp
+    - sha256sum
+    - ssh
+    - tar
 inputs:
   - name: ONPREM_SERVER_IP
     required: true

@@ -48,6 +48,64 @@ validate_compatibility_sidecar() {
   [[ "${core_min}" != "${core_max}" && "$(printf '%s\n%s\n' "${core_min}" "${core_max}" | sort -V | head -n1)" == "${core_min}" ]] || fail "${sidecar} has an empty Core compatibility window"
 }
 
+sidecar_runtime_scalar() {
+  local sidecar="$1" key="$2"
+  awk -v key="${key}" '
+    /^runtime:/ { in_runtime=1; next }
+    in_runtime && $0 ~ "^  " key ":" {
+      sub("^  " key ":[[:space:]]*", "", $0)
+      print
+      exit
+    }
+    in_runtime && /^[^[:space:]]/ { exit }
+  ' "${sidecar}"
+}
+
+sidecar_runtime_list() {
+  local sidecar="$1" key="$2"
+  awk -v key="${key}" '
+    /^runtime:/ { in_runtime=1; next }
+    in_runtime && $0 == "  " key ":" { in_list=1; next }
+    in_list && /^    - / { sub(/^    - /, "", $0); print; next }
+    in_list { exit }
+    in_runtime && /^[^[:space:]]/ { exit }
+  ' "${sidecar}"
+}
+
+validate_runtime_sidecar() {
+  local profile_env="$1" sidecar="${profile_env%.env}.package.yaml"
+  local expected_scope expected_capability required_commands actual_commands
+
+  case "${PK3S_INFRA_CATEGORY}:${PK3S_INFRA_ENGINE}:${PK3S_INFRA_SCENARIO}" in
+    cloud:opentofu:*)
+      expected_scope="cloud-api"
+      expected_capability="cloud-api"
+      required_commands=$'jq\ntofu'
+      ;;
+    edge:ansible:*)
+      expected_scope="remote-host"
+      expected_capability="remote-ssh"
+      required_commands=$'ansible-playbook\ncurl\njq\npython3\nscp\nsha256sum\nssh\ntar'
+      ;;
+    local:opentofu:multipass)
+      expected_scope="local-host"
+      expected_capability="local-virtualization"
+      required_commands=$'curl\njq\nmultipass\nsha256sum\nssh\nssh-keygen\ntar\ntimeout\ntofu'
+      ;;
+    *)
+      fail "${profile_env} has no runtime capability mapping for ${PK3S_INFRA_CATEGORY}:${PK3S_INFRA_ENGINE}:${PK3S_INFRA_SCENARIO}"
+      ;;
+  esac
+
+  [[ "$(sidecar_runtime_scalar "${sidecar}" executionScope)" == "${expected_scope}" ]] || \
+    fail "${sidecar} must declare runtime.executionScope ${expected_scope}"
+  [[ "$(sidecar_runtime_list "${sidecar}" requiredCapabilities)" == "${expected_capability}" ]] || \
+    fail "${sidecar} must declare runtime.requiredCapabilities ${expected_capability}"
+  actual_commands="$(sidecar_runtime_list "${sidecar}" requiredCommands | sort -u)"
+  [[ "${actual_commands}" == "${required_commands}" ]] || \
+    fail "${sidecar} has incomplete runtime.requiredCommands"
+}
+
 profile_count=0
 while IFS= read -r profile_env; do
   unset \
@@ -85,6 +143,7 @@ while IFS= read -r profile_env; do
   [[ -d "${ROOT_DIR}/${PK3S_INFRA_SCENARIO_PATH}" ]] || \
     fail "${profile_env} scenario path does not exist: ${PK3S_INFRA_SCENARIO_PATH}"
   validate_compatibility_sidecar "${profile_env}"
+  validate_runtime_sidecar "${profile_env}"
 
   for target in \
     "${PK3S_INFRA_APPLY_TARGET}" \

@@ -76,6 +76,12 @@ The `profile.env` embedded in a public `profile.tgz` is treated as package defau
 
 Published packages normalize `PRODUCTIVE_K3S_SOURCE=remote` so the normal user path resolves a released Core bundle without requiring a sibling source checkout. An explicit runtime override can still select `local` for development.
 
+Every published Profile also declares its execution scope, required runtime
+capabilities, and required commands. `pk3s profile list` and `pk3s profile
+show` use this metadata to report whether the current environment can execute
+the Profile before an installation starts. For example, Multipass Profiles
+require local virtualization, while on-prem Profiles require remote SSH tools.
+
 ## Choose the Productive K3S Core source mode
 
 Most public scenarios support two source modes:
